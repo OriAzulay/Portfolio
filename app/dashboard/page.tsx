@@ -258,7 +258,7 @@ export default function DashboardPage() {
       ...prev,
       projects: [
         ...prev.projects,
-        { title: "New Project", description: "", tags: [], link: "#" },
+        { title: "New Project", description: "", tags: [], link: "#", imageUrl: "" },
       ],
     }));
   };
@@ -332,6 +332,21 @@ export default function DashboardPage() {
     reader.onload = () => {
       if (typeof reader.result === "string") {
         updatePersonalInfo("avatarUrl", reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleProjectImageUpload = (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        updateProject(index, "imageUrl", reader.result);
       }
     };
     reader.readAsDataURL(file);
@@ -765,6 +780,20 @@ export default function DashboardPage() {
             {data.projects.map((project, index) => (
               <div className="content-card" key={`${project.title}-${index}`}>
                 <div className="input-wrapper">
+                  <div>
+                    <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "6px" }}>
+                      Project image
+                    </div>
+                    <label className="toolBtn" style={{ display: "inline-flex" }}>
+                      Upload Image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleProjectImageUpload(index, e)}
+                        style={{ display: "none" }}
+                      />
+                    </label>
+                  </div>
                   <input
                     className="form-input"
                     type="text"

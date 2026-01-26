@@ -44,6 +44,7 @@ export interface Project {
   description: string;
   tags: string[];
   link: string;
+  imageUrl: string;
 }
 
 export interface GalleryItem {
@@ -124,18 +125,21 @@ high-quality, scalable solutions that make a real impact.`,
       description: "A full-stack web application built with React and Node.js",
       tags: ["React", "Node.js", "MongoDB"],
       link: "#",
+      imageUrl: "",
     },
     {
       title: "Project Two",
       description: "Mobile-responsive e-commerce platform with payment integration",
       tags: ["Next.js", "Stripe", "Tailwind"],
       link: "#",
+      imageUrl: "",
     },
     {
       title: "Project Three",
       description: "Real-time chat application with WebSocket support",
       tags: ["React", "Socket.io", "Express"],
       link: "#",
+      imageUrl: "",
     },
   ],
   gallery: [
@@ -183,7 +187,10 @@ export function getPortfolioData(): PortfolioData {
           skills: parsed.skills ?? defaultPortfolioData.skills,
           experience: parsed.experience ?? defaultPortfolioData.experience,
           education: parsed.education ?? defaultPortfolioData.education,
-          projects: parsed.projects ?? defaultPortfolioData.projects,
+          projects: (parsed.projects ?? defaultPortfolioData.projects).map((proj) => ({
+            ...proj,
+            imageUrl: (proj as Project).imageUrl ?? "",
+          })),
           gallery: parsed.gallery ?? defaultPortfolioData.gallery,
         };
       } catch {
