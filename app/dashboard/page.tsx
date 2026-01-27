@@ -325,31 +325,61 @@ export default function DashboardPage() {
     .map((part) => part.charAt(0))
     .join("");
   const encodeText = (text: string) => encodeURIComponent(text);
-  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        updatePersonalInfo("avatarUrl", reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+  const uploadFile = async (file: File, kind: "avatar" | "project" | "gallery") => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("kind", kind);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Upload failed");
+    }
+
+    const data = await response.json();
+    return data.url as string;
   };
 
-  const handleProjectImageUpload = (
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const url = await uploadFile(file, "avatar");
+      updatePersonalInfo("avatarUrl", url);
+    } catch {
+      alert("Avatar upload failed.");
+    }
+  };
+
+  const handleProjectImageUpload = async (
     index: number,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        updateProject(index, "imageUrl", reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const url = await uploadFile(file, "project");
+      updateProject(index, "imageUrl", url);
+    } catch {
+      alert("Project image upload failed.");
+    }
+  };
+
+  const handleGalleryImageUpload = async (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const url = await uploadFile(file, "gallery");
+      updateGalleryItem(index, "imageUrl", url);
+    } catch {
+      alert("Gallery image upload failed.");
+    }
   };
 
   return (
@@ -888,6 +918,20 @@ export default function DashboardPage() {
             {(data.gallery ?? []).map((item, index) => (
               <div className="content-card" key={`${item.title}-${index}`}>
                 <div className="input-wrapper">
+                  <div>
+                    <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "6px" }}>
+                      Gallery image
+                    </div>
+                    <label className="toolBtn" style={{ display: "inline-flex" }}>
+                      Upload Image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleGalleryImageUpload(index, e)}
+                        style={{ display: "none" }}
+                      />
+                    </label>
+                  </div>
                   <input
                     className="form-input"
                     type="text"
