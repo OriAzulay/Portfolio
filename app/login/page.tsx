@@ -33,6 +33,9 @@ export default function LoginPage() {
 
       if (response.ok) {
         setAuthToken();
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("admin_password", password);
+        }
         router.push("/dashboard");
       } else {
         setError(data.error || "Login failed");

@@ -326,12 +326,21 @@ export default function DashboardPage() {
     .join("");
   const encodeText = (text: string) => encodeURIComponent(text);
   const uploadFile = async (file: File, kind: "avatar" | "project" | "gallery") => {
+    const adminPassword =
+      typeof window !== "undefined" ? sessionStorage.getItem("admin_password") : null;
+    if (!adminPassword) {
+      throw new Error("Missing admin password");
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("kind", kind);
 
     const response = await fetch("/api/upload", {
       method: "POST",
+      headers: {
+        "x-admin-password": adminPassword,
+      },
       body: formData,
     });
 

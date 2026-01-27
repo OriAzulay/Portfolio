@@ -34,6 +34,7 @@ ADMIN_PASSWORD=your-secure-password
 ```
 
 Use that password on the login page to edit your portfolio.
+It’s also used to authorize image uploads.
 
 ---
 
@@ -43,6 +44,7 @@ Use that password on the login page to edit your portfolio.
 - Dashboard: `app/dashboard/page.tsx`
 - Styles: `app/globals.css`
 - Data schema: `app/lib/portfolio-data.ts`
+- Upload API: `app/api/upload/route.ts`
 
 ---
 
@@ -56,6 +58,21 @@ public/assets/fonts/poppins/
 ```
 
 If you don’t add them, it will fall back to system fonts.
+
+---
+
+## Image uploads
+
+Uploads from the dashboard are saved to:
+
+```
+public/uploads/{avatar|project|gallery}/
+```
+
+These files are ignored in git (see `.gitignore`).
+
+Note: If you deploy to a serverless host, local disk can be ephemeral.  
+For production storage, use S3 or another object store.
 
 ---
 

@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Default password - change this in production!
-const DEFAULT_PASSWORD = "admin123";
-
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json();
-    const adminPassword = process.env.ADMIN_PASSWORD || DEFAULT_PASSWORD;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminPassword) {
+      return NextResponse.json(
+        { error: "Server configuration error" },
+        { status: 500 }
+      );
+    }
 
     if (password === adminPassword) {
       return NextResponse.json({ success: true });

@@ -5,12 +5,27 @@ import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const providedPassword = request.headers.get("x-admin-password");
+    if (!adminPassword || providedPassword !== adminPassword) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file");
     const kindRaw = (formData.get("kind") || "generic").toString();
 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "Missing file" }, { status: 400 });
+    }
+
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json({ error: "Invalid file type" }, { status: 415 });
+    }
+
+    const maxSizeBytes = 5 * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      return NextResponse.json({ error: "File too large" }, { status: 413 });
     }
 
     const safeKind = kindRaw.replace(/[^a-z0-9-_]/gi, "").toLowerCase() || "generic";

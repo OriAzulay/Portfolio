@@ -770,7 +770,7 @@ main {
 
 .showcase-text {
   color: var(--light-gray);
-  font-size: var(--fs-20);
+  font-size: var(--fs-6);
   font-weight: var(--fw-300);
   line-height: 1.6;
 }
