@@ -6,6 +6,7 @@ import {
   PortfolioData,
   defaultPortfolioData,
   getPortfolioData,
+  fetchPortfolioFromSupabase,
 } from "./lib/portfolio-data";
 
 const Icons = {
@@ -83,8 +84,20 @@ function usePortfolioData() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setData(getPortfolioData());
-    setMounted(true);
+    const loadData = async () => {
+      try {
+        // Try to fetch from Supabase first
+        const portfolioData = await fetchPortfolioFromSupabase();
+        setData(portfolioData);
+      } catch (error) {
+        // Fallback to localStorage if Supabase fails
+        console.error("Supabase fetch failed, using localStorage:", error);
+        setData(getPortfolioData());
+      }
+      setMounted(true);
+    };
+
+    loadData();
   }, []);
 
   return { data, mounted };

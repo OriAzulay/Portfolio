@@ -8,6 +8,9 @@ import {
   defaultPortfolioData,
   getPortfolioData,
   savePortfolioData,
+  fetchPortfolioFromSupabase,
+  savePortfolioToSupabase,
+  uploadImageToSupabase,
   Skill,
   Experience,
   Education,
@@ -120,18 +123,37 @@ export default function DashboardPage() {
       router.push("/login");
       return;
     }
-    setData(getPortfolioData());
-    setLoading(false);
+    
+    // Load data from Supabase (with localStorage fallback)
+    const loadData = async () => {
+      try {
+        const portfolioData = await fetchPortfolioFromSupabase();
+        setData(portfolioData);
+      } catch (error) {
+        console.error("Failed to load from Supabase, using localStorage:", error);
+        setData(getPortfolioData());
+      }
+      setLoading(false);
+    };
+    
+    loadData();
   }, [router]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaving(true);
-    savePortfolioData(data);
-    setTimeout(() => {
-      setSaving(false);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    }, 500);
+    
+    // Save to both Supabase and localStorage
+    const success = await savePortfolioToSupabase(data);
+    
+    if (!success) {
+      // Fallback: save to localStorage only
+      savePortfolioData(data);
+      console.warn("Saved to localStorage only (Supabase unavailable)");
+    }
+    
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   };
 
   const handleLogout = () => {
@@ -325,31 +347,14 @@ export default function DashboardPage() {
     .map((part) => part.charAt(0))
     .join("");
   const encodeText = (text: string) => encodeURIComponent(text);
+  
+  // Upload file to Supabase Storage
   const uploadFile = async (file: File, kind: "avatar" | "project" | "gallery") => {
-    const adminPassword =
-      typeof window !== "undefined" ? sessionStorage.getItem("admin_password") : null;
-    if (!adminPassword) {
-      throw new Error("Missing admin password");
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("kind", kind);
-
-    const response = await fetch("/api/upload", {
-      method: "POST",
-      headers: {
-        "x-admin-password": adminPassword,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
+    const url = await uploadImageToSupabase(file, kind);
+    if (!url) {
       throw new Error("Upload failed");
     }
-
-    const data = await response.json();
-    return data.url as string;
+    return url;
   };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
