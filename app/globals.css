@@ -359,6 +359,8 @@ main {
   justify-content: flex-start;
   align-items: center;
   gap: 15px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .avatar-box {
@@ -366,10 +368,14 @@ main {
   overflow: hidden;
   border-radius: 10px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .avatar-box img {
   background: var(--bg-gradient-onyx);
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
 }
 
 /* Fullscreen modal */
@@ -405,11 +411,20 @@ main {
   transform: scale(1);
 }
 
+.info-content {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .info-content .name {
   color: var(--white-2);
   font-size: var(--fs-2);
   font-weight: var(--fw-500);
   margin-bottom: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .info-content .title {
@@ -418,8 +433,12 @@ main {
   font-size: var(--fs-8);
   font-weight: var(--fw-300);
   width: max-content;
+  max-width: 100%;
   padding: 3px 12px;
   border-radius: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .info-content h1:focus {
@@ -2117,14 +2136,28 @@ article.sidebar.active {
   .avatar-box img {
     background: var(--bg-gradient-onyx);
     width: 120px;
+    height: 120px;
+  }
+
+  .info-content {
+    flex: unset;
+    min-width: unset;
+    overflow: visible;
   }
 
   .info-content .name {
     margin-bottom: 15px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .info-content .title {
     padding: 5px 18px;
+    max-width: unset;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   .info_more-btn {
@@ -2510,11 +2543,14 @@ article.sidebar.active {
   .avatar-box img {
     background: var(--bg-gradient-onyx);
     width: 170px;
+    height: 170px;
   }
 
   .info-content .name {
     white-space: nowrap;
     text-align: center;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .info-content .title {
