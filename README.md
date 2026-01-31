@@ -41,6 +41,7 @@ This portfolio application provides:
    ADMIN_PASSWORD=your-secure-password
    NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   RESEND_API_KEY=re_your-resend-api-key
    ```
 
 4. **Set up Supabase**
@@ -175,6 +176,22 @@ Key CSS sections:
 |----------|--------|-------------|
 | `/api/auth/login` | POST | Validate admin password, return token |
 | `/api/upload` | POST | Upload image to local filesystem (fallback) |
+| `/api/contact` | POST | Send contact form email notification |
+
+---
+
+## Contact Form Email Setup
+
+The contact form sends email notifications using [Resend](https://resend.com).
+
+### Setup Steps:
+
+1. Create a free account at [resend.com](https://resend.com)
+2. Get your API key from the dashboard
+3. Add `RESEND_API_KEY` to your `.env.local` file
+4. (Optional) Verify your domain for custom "from" addresses
+
+**Note:** The free tier allows 100 emails/day, which is enough for most portfolios.
 
 ---
 
@@ -188,6 +205,7 @@ Key CSS sections:
    - `ADMIN_PASSWORD`
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `RESEND_API_KEY`
 4. Deploy
 
 ### Environment Variables
@@ -197,6 +215,7 @@ Key CSS sections:
 | `ADMIN_PASSWORD` | Yes | Password for dashboard access |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anonymous key |
+| `RESEND_API_KEY` | Optional | Resend API key for contact form emails |
 
 ---
 
@@ -208,6 +227,7 @@ Key CSS sections:
 | React | 19.2.3 | UI library |
 | TypeScript | 5.x | Type safety |
 | Supabase | 2.93.3 | Database & file storage |
+| Resend | latest | Email notifications |
 | DOMPurify | 3.3.1 | HTML sanitization |
 
 ---

@@ -103,6 +103,111 @@ function usePortfolioData() {
   return { data, mounted };
 }
 
+// Contact Form Component
+function ContactForm({ recipientEmail }: { recipientEmail: string }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      setErrorMessage("Please fill in all fields");
+      setStatus("error");
+      return;
+    }
+
+    setStatus("sending");
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          recipientEmail,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      setStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+      
+      // Reset to idle after 5 seconds
+      setTimeout(() => setStatus("idle"), 5000);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Failed to send message");
+      setStatus("error");
+    }
+  };
+
+  return (
+    <section className="contact-form-box">
+      <div className="contact-form-wrapper">
+        <h3 className="h3 form-title">Contact Form</h3>
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="input-wrapper">
+            <input
+              className="form-input"
+              type="text"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+              disabled={status === "sending"}
+            />
+            <input
+              className="form-input"
+              type="email"
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+              disabled={status === "sending"}
+            />
+          </div>
+          <textarea
+            className="form-input"
+            placeholder="Your Message"
+            value={formData.message}
+            onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
+            disabled={status === "sending"}
+          />
+          
+          {status === "error" && (
+            <p style={{ color: "var(--bittersweet-shimmer)", fontSize: "14px", marginBottom: "15px" }}>
+              {errorMessage}
+            </p>
+          )}
+          
+          {status === "success" && (
+            <p style={{ color: "#00c853", fontSize: "14px", marginBottom: "15px" }}>
+              ✓ Message sent successfully! Thank you for reaching out.
+            </p>
+          )}
+          
+          <button 
+            className="form-btn" 
+            type="submit"
+            disabled={status === "sending"}
+            style={{ opacity: status === "sending" ? 0.7 : 1 }}
+          >
+            {status === "sending" ? "Sending..." : "Send Message"}
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+}
+
 // Main Page Component
 export default function Home() {
   const { data, mounted } = usePortfolioData();
@@ -480,21 +585,7 @@ export default function Home() {
             )}
           </section>
 
-          <section className="contact-form-box">
-            <div className="contact-form-wrapper">
-              <h3 className="h3 form-title">Contact Form</h3>
-              <form className="contact-form">
-                <div className="input-wrapper">
-                  <input className="form-input" type="text" placeholder="Full Name" />
-                  <input className="form-input" type="email" placeholder="Email Address" />
-                </div>
-                <textarea className="form-input" placeholder="Your Message"></textarea>
-                <button className="form-btn" type="submit">
-                  Send Message
-                </button>
-              </form>
-            </div>
-          </section>
+          <ContactForm recipientEmail={data.personalInfo.email} />
         </article>
 
         <article className={`gallery ${activeTab === "gallery" ? "active" : ""}`}>
