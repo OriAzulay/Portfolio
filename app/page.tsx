@@ -469,13 +469,15 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            <div className="qr-box">
-              <img
-                className="qr-image"
-                src={`data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><rect width='100%' height='100%' fill='%23252525'/><text x='50%' y='50%' text-anchor='middle' font-size='14' fill='%23ffffff' font-family='Poppins,Arial'>${encodeText("QR")}</text></svg>`}
-                alt="QR placeholder"
-              />
-            </div>
+            {data.personalInfo.qrCodeUrl && (
+              <div className="qr-box">
+                <img
+                  className="qr-image"
+                  src={data.personalInfo.qrCodeUrl}
+                  alt="QR Code"
+                />
+              </div>
+            )}
           </section>
 
           <section className="contact-form-box">

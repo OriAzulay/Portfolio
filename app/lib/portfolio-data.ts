@@ -8,6 +8,7 @@ export interface PersonalInfo {
   phone: string;
   location: string;
   about: string;
+  qrCodeUrl: string;
   social: {
     github: string;
     linkedin: string;
@@ -76,6 +77,7 @@ I love creating elegant solutions to complex problems and am always eager to lea
 
 With a strong foundation in both frontend and backend development, I strive to deliver 
 high-quality, scalable solutions that make a real impact.`,
+    qrCodeUrl: "",
     social: {
       github: "https://github.com/yourusername",
       linkedin: "https://linkedin.com/in/yourusername",

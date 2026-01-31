@@ -698,7 +698,7 @@ export default function DashboardPage() {
               </button>
             </div>
             {data.experience.map((exp, index) => (
-              <div className="content-card" key={`${exp.company}-${index}`}>
+              <div className="content-card" key={`exp-${index}`}>
                 <div className="input-wrapper">
                   <input
                     className="form-input"
@@ -745,7 +745,7 @@ export default function DashboardPage() {
               </button>
             </div>
             {data.education.map((edu, index) => (
-              <div className="content-card" key={`${edu.school}-${index}`}>
+              <div className="content-card" key={`edu-${index}`}>
                 <div className="input-wrapper">
                   <input
                     className="form-input"
@@ -788,7 +788,7 @@ export default function DashboardPage() {
               </button>
             </div>
             {data.skills.map((skill, index) => (
-              <div className="content-card" key={`${skill.name}-${index}`}>
+              <div className="content-card" key={`skill-${index}`}>
                 <div className="input-wrapper">
                   <input
                     className="form-input"
@@ -833,20 +833,39 @@ export default function DashboardPage() {
           <h2 className="h2 article-title">Projects</h2>
         </header>
 
-        <section className="contact-form-box">
-          <div className="contact-form-wrapper">
-            <div className="buttonContainer">
-              <button className="toolBtn" type="button" onClick={addProject}>
-                Add Project
-              </button>
-            </div>
-            {data.projects.map((project, index) => (
-              <div className="content-card" key={`${project.title}-${index}`}>
-                <div className="input-wrapper">
-                  <div>
-                    <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "6px" }}>
-                      Project image
-                    </div>
+        <section className="dashboard-section">
+          <div className="buttonContainer" style={{ marginBottom: "20px" }}>
+            <button className="toolBtn" type="button" onClick={addProject}>
+              + Add Project
+            </button>
+          </div>
+          {data.projects.map((project, index) => (
+            <div className="dashboard-section" key={`project-${index}`} style={{ marginBottom: "20px", background: "var(--eerie-black-2)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <h4 style={{ color: "var(--white-2)", fontSize: "var(--fs-5)" }}>
+                  {project.title || `Project ${index + 1}`}
+                </h4>
+                <button 
+                  className="toolBtn" 
+                  type="button" 
+                  onClick={() => removeProject(index)}
+                  style={{ color: "var(--bittersweet-shimmer)" }}
+                >
+                  Remove
+                </button>
+              </div>
+              
+              <div className="dashboard-input-grid">
+                <div className="dashboard-field">
+                  <label className="dashboard-label">Project Image</label>
+                  <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                    {project.imageUrl && (
+                      <img 
+                        src={project.imageUrl} 
+                        alt="Preview" 
+                        style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px" }}
+                      />
+                    )}
                     <label className="toolBtn" style={{ display: "inline-flex" }}>
                       Upload Image
                       <input
@@ -857,48 +876,81 @@ export default function DashboardPage() {
                       />
                     </label>
                   </div>
+                </div>
+                <div className="dashboard-field">
+                  <label className="dashboard-label">Project Title</label>
                   <input
-                    className="form-input"
+                    className="dashboard-input"
                     type="text"
                     value={project.title}
                     onChange={(e) => updateProject(index, "title", e.target.value)}
-                    placeholder="Project Title"
+                    placeholder="My Awesome Project"
                   />
+                </div>
+                <div className="dashboard-field">
+                  <label className="dashboard-label">Project Link</label>
                   <input
-                    className="form-input"
+                    className="dashboard-input"
                     type="url"
                     value={project.link}
                     onChange={(e) => updateProject(index, "link", e.target.value)}
-                    placeholder="Project Link"
+                    placeholder="https://example.com"
                   />
                 </div>
+              </div>
+              
+              <div className="dashboard-field" style={{ marginTop: "16px" }}>
+                <label className="dashboard-label">Description</label>
                 <textarea
-                  className="form-input"
+                  className="dashboard-input"
                   value={project.description}
                   onChange={(e) => updateProject(index, "description", e.target.value)}
-                  placeholder="Project Description"
+                  placeholder="Describe your project..."
+                  style={{ minHeight: "80px", resize: "vertical" }}
                 />
-                <input
-                  className="form-input"
-                  type="text"
-                  value={project.tags.join(", ")}
-                  onChange={(e) =>
-                    updateProject(
-                      index,
-                      "tags",
-                      e.target.value.split(",").map((t) => t.trim()).filter(Boolean)
-                    )
-                  }
-                  placeholder="Tags (comma-separated)"
-                />
-                <div className="buttonContainer">
-                  <button className="toolBtn" type="button" onClick={() => removeProject(index)}>
-                    Remove
-                  </button>
-                </div>
               </div>
-            ))}
-          </div>
+              
+              <div className="dashboard-field" style={{ marginTop: "16px" }}>
+                <label className="dashboard-label">Tags</label>
+                <div className="tags-container">
+                  {project.tags.map((tag, tagIndex) => (
+                    <span key={tagIndex} className="tag-chip">
+                      {tag}
+                      <button
+                        type="button"
+                        className="tag-remove"
+                        onClick={() => {
+                          const newTags = project.tags.filter((_, i) => i !== tagIndex);
+                          updateProject(index, "tags", newTags);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    className="tag-input"
+                    type="text"
+                    placeholder="Add tag + Enter"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const input = e.currentTarget;
+                        const newTag = input.value.trim();
+                        if (newTag && !project.tags.includes(newTag)) {
+                          updateProject(index, "tags", [...project.tags, newTag]);
+                          input.value = "";
+                        }
+                      }
+                    }}
+                  />
+                </div>
+                <p style={{ fontSize: "11px", color: "var(--light-gray-70)", marginTop: "6px" }}>
+                  Press Enter to add a tag. Click × to remove.
+                </p>
+              </div>
+            </div>
+          ))}
         </section>
       </article>
 
@@ -907,31 +959,137 @@ export default function DashboardPage() {
           <h2 className="h2 article-title">Contact</h2>
         </header>
 
-        <section className="contact-form-box">
-          <div className="contact-form-wrapper">
-            <div className="input-wrapper">
+        <section className="dashboard-section">
+          <h3 className="dashboard-section-title">Contact Information</h3>
+          <div className="dashboard-input-grid">
+            <div className="dashboard-field">
+              <label className="dashboard-label">Email Address</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="email"
                 value={data.personalInfo.email}
                 onChange={(e) => updatePersonalInfo("email", e.target.value)}
-                placeholder="Email"
+                placeholder="your.email@example.com"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">Phone Number</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="text"
                 value={data.personalInfo.phone}
                 onChange={(e) => updatePersonalInfo("phone", e.target.value)}
-                placeholder="Phone"
+                placeholder="+1 234 567 8900"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">Location</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="text"
                 value={data.personalInfo.location}
                 onChange={(e) => updatePersonalInfo("location", e.target.value)}
-                placeholder="Location"
+                placeholder="City, Country"
               />
             </div>
+          </div>
+        </section>
+
+        <section className="dashboard-section">
+          <h3 className="dashboard-section-title">QR Code</h3>
+          <p style={{ fontSize: "12px", color: "var(--light-gray-70)", marginBottom: "16px" }}>
+            Upload a QR code image that visitors can scan (e.g., link to your vCard, LinkedIn, or website)
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+            {data.personalInfo.qrCodeUrl ? (
+              <div style={{ 
+                width: "120px", 
+                height: "120px", 
+                borderRadius: "12px", 
+                overflow: "hidden",
+                border: "1px solid var(--jet)",
+                background: "var(--eerie-black-2)"
+              }}>
+                <img
+                  src={data.personalInfo.qrCodeUrl}
+                  alt="QR Code preview"
+                  style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                />
+              </div>
+            ) : (
+              <div style={{ 
+                width: "120px", 
+                height: "120px", 
+                borderRadius: "12px", 
+                border: "1px dashed var(--jet)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--light-gray-70)",
+                fontSize: "12px",
+                textAlign: "center",
+                padding: "10px"
+              }}>
+                No QR Code
+              </div>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <label className="toolBtn" style={{ display: "inline-flex" }}>
+                Upload QR Code
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      const url = await uploadFile(file, "avatar");
+                      setData((prev) => {
+                        const newData = {
+                          ...prev,
+                          personalInfo: { ...prev.personalInfo, qrCodeUrl: url },
+                        };
+                        savePortfolioToSupabase(newData);
+                        return newData;
+                      });
+                      alert("QR Code uploaded and saved!");
+                    } catch {
+                      alert("QR Code upload failed.");
+                    }
+                  }}
+                  style={{ display: "none" }}
+                />
+              </label>
+              {data.personalInfo.qrCodeUrl && (
+                <button
+                  type="button"
+                  className="toolBtn"
+                  style={{ color: "var(--bittersweet-shimmer)" }}
+                  onClick={() => {
+                    setData((prev) => {
+                      const newData = {
+                        ...prev,
+                        personalInfo: { ...prev.personalInfo, qrCodeUrl: "" },
+                      };
+                      savePortfolioToSupabase(newData);
+                      return newData;
+                    });
+                  }}
+                >
+                  Remove QR Code
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="dashboard-field" style={{ marginTop: "16px" }}>
+            <label className="dashboard-label">Or paste QR Code URL</label>
+            <input
+              className="dashboard-input"
+              type="url"
+              value={data.personalInfo.qrCodeUrl || ""}
+              onChange={(e) => updatePersonalInfo("qrCodeUrl", e.target.value)}
+              placeholder="https://example.com/qr-code.png"
+            />
           </div>
         </section>
       </article>
@@ -949,7 +1107,7 @@ export default function DashboardPage() {
               </button>
             </div>
             {(data.gallery ?? []).map((item, index) => (
-              <div className="content-card" key={`${item.title}-${index}`}>
+              <div className="content-card" key={`gallery-${index}`}>
                 <div className="input-wrapper">
                   <div>
                     <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "6px" }}>

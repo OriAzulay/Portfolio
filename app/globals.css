@@ -1889,6 +1889,68 @@ article.sidebar.active {
   margin-top: 24px;
 }
 
+/* Tag input styles */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--eerie-black-2);
+  border: 1px solid var(--jet);
+  border-radius: 10px;
+  min-height: 48px;
+  align-items: center;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-gradient-onyx);
+  color: var(--sky-blue-crayola);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: var(--fs-7);
+  font-weight: var(--fw-400);
+  border: 1px solid var(--jet);
+}
+
+.tag-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  color: var(--light-gray-70);
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition-1);
+}
+
+.tag-remove:hover {
+  background: var(--bittersweet-shimmer);
+  color: var(--white-1);
+}
+
+.tag-input {
+  flex: 1;
+  min-width: 100px;
+  background: transparent;
+  border: none;
+  color: var(--white-2);
+  font-size: var(--fs-6);
+  padding: 4px 0;
+  outline: none;
+}
+
+.tag-input::placeholder {
+  color: var(--light-gray-70);
+  opacity: 0.6;
+}
+
 /* Simple rich text editor */
 .editor-toolbar {
   display: flex;
