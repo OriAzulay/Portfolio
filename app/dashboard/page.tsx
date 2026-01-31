@@ -362,7 +362,17 @@ export default function DashboardPage() {
     if (!file) return;
     try {
       const url = await uploadFile(file, "avatar");
-      updatePersonalInfo("avatarUrl", url);
+      // Update state and auto-save
+      setData((prev) => {
+        const newData = {
+          ...prev,
+          personalInfo: { ...prev.personalInfo, avatarUrl: url },
+        };
+        // Auto-save to Supabase
+        savePortfolioToSupabase(newData);
+        return newData;
+      });
+      alert("Avatar uploaded and saved!");
     } catch {
       alert("Avatar upload failed.");
     }
@@ -376,7 +386,19 @@ export default function DashboardPage() {
     if (!file) return;
     try {
       const url = await uploadFile(file, "project");
-      updateProject(index, "imageUrl", url);
+      // Update state and auto-save
+      setData((prev) => {
+        const newData = {
+          ...prev,
+          projects: prev.projects.map((proj, i) =>
+            i === index ? { ...proj, imageUrl: url } : proj
+          ),
+        };
+        // Auto-save to Supabase
+        savePortfolioToSupabase(newData);
+        return newData;
+      });
+      alert("Project image uploaded and saved!");
     } catch {
       alert("Project image upload failed.");
     }
@@ -390,7 +412,19 @@ export default function DashboardPage() {
     if (!file) return;
     try {
       const url = await uploadFile(file, "gallery");
-      updateGalleryItem(index, "imageUrl", url);
+      // Update state and auto-save
+      setData((prev) => {
+        const newData = {
+          ...prev,
+          gallery: prev.gallery.map((item, i) =>
+            i === index ? { ...item, imageUrl: url } : item
+          ),
+        };
+        // Auto-save to Supabase
+        savePortfolioToSupabase(newData);
+        return newData;
+      });
+      alert("Gallery image uploaded and saved!");
     } catch {
       alert("Gallery image upload failed.");
     }
@@ -448,111 +482,146 @@ export default function DashboardPage() {
           <h2 className="h2 article-title">Sidebar</h2>
         </header>
 
-        <section className="contact-form-box">
-          <div className="contact-form-wrapper">
-            <h3 className="h3 form-title">Profile</h3>
-            <div className="avatar-box" style={{ width: "140px" }}>
-              <img
-                src={
-                  data.personalInfo.avatarUrl
-                    ? data.personalInfo.avatarUrl
-                    : `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><rect width='100%' height='100%' fill='%23222222'/><text x='50%' y='55%' text-anchor='middle' font-size='64' fill='%23ffffff' font-family='Poppins,Arial'>${encodeText(initials)}</text></svg>`
-                }
-                alt="Avatar preview"
-              />
+        <section className="dashboard-section">
+          <h3 className="dashboard-section-title">Profile</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+              <div className="avatar-box" style={{ width: "100px", height: "100px", flexShrink: 0 }}>
+                <img
+                  src={
+                    data.personalInfo.avatarUrl
+                      ? data.personalInfo.avatarUrl
+                      : `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><rect width='100%' height='100%' fill='%23222222'/><text x='50%' y='55%' text-anchor='middle' font-size='64' fill='%23ffffff' font-family='Poppins,Arial'>${encodeText(initials)}</text></svg>`
+                  }
+                  alt="Avatar preview"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+              <div style={{ flex: 1, minWidth: "200px" }}>
+                <label className="toolBtn" style={{ display: "inline-flex", marginBottom: "10px" }}>
+                  Upload Avatar
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              </div>
             </div>
-            <div className="input-wrapper">
-              <input
-                className="form-input"
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarUpload}
-              />
-              <input
-                className="form-input"
-                type="url"
-                value={data.personalInfo.avatarUrl}
-                onChange={(e) => updatePersonalInfo("avatarUrl", e.target.value)}
-                placeholder="Avatar Image URL"
-              />
-              <input
-                className="form-input"
-                type="text"
-                value={data.personalInfo.name}
-                onChange={(e) => updatePersonalInfo("name", e.target.value)}
-                placeholder="Full Name"
-              />
-              <input
-                className="form-input"
-                type="text"
-                value={data.personalInfo.title}
-                onChange={(e) => updatePersonalInfo("title", e.target.value)}
-                placeholder="Title"
-              />
+            
+            <div className="dashboard-input-grid">
+              <div className="dashboard-field">
+                <label className="dashboard-label">Avatar URL</label>
+                <input
+                  className="dashboard-input"
+                  type="url"
+                  value={data.personalInfo.avatarUrl}
+                  onChange={(e) => updatePersonalInfo("avatarUrl", e.target.value)}
+                  placeholder="https://example.com/avatar.jpg"
+                />
+              </div>
+              <div className="dashboard-field">
+                <label className="dashboard-label">Full Name</label>
+                <input
+                  className="dashboard-input"
+                  type="text"
+                  value={data.personalInfo.name}
+                  onChange={(e) => updatePersonalInfo("name", e.target.value)}
+                  placeholder="John Doe"
+                />
+              </div>
+              <div className="dashboard-field">
+                <label className="dashboard-label">Title / Role</label>
+                <input
+                  className="dashboard-input"
+                  type="text"
+                  value={data.personalInfo.title}
+                  onChange={(e) => updatePersonalInfo("title", e.target.value)}
+                  placeholder="Software Developer"
+                />
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="contact-form-box">
-          <div className="contact-form-wrapper">
-            <h3 className="h3 form-title">Sidebar Contacts</h3>
-            <div className="input-wrapper">
+        <section className="dashboard-section">
+          <h3 className="dashboard-section-title">Contact Information</h3>
+          <div className="dashboard-input-grid">
+            <div className="dashboard-field">
+              <label className="dashboard-label">Email Address</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="email"
                 value={data.personalInfo.email}
                 onChange={(e) => updatePersonalInfo("email", e.target.value)}
-                placeholder="Email"
+                placeholder="your.email@example.com"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">Phone Number</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="text"
                 value={data.personalInfo.phone}
                 onChange={(e) => updatePersonalInfo("phone", e.target.value)}
-                placeholder="Phone"
+                placeholder="+1 234 567 8900"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">Location</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="text"
                 value={data.personalInfo.location}
                 onChange={(e) => updatePersonalInfo("location", e.target.value)}
-                placeholder="Location"
+                placeholder="City, Country"
               />
             </div>
           </div>
         </section>
 
-        <section className="contact-form-box">
-          <div className="contact-form-wrapper">
-            <h3 className="h3 form-title">Social Links</h3>
-            <div className="input-wrapper">
+        <section className="dashboard-section">
+          <h3 className="dashboard-section-title">Social Links</h3>
+          <div className="dashboard-input-grid">
+            <div className="dashboard-field">
+              <label className="dashboard-label">GitHub</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="url"
                 value={data.personalInfo.social.github}
                 onChange={(e) => updateSocial("github", e.target.value)}
-                placeholder="GitHub URL"
+                placeholder="https://github.com/username"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">LinkedIn</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="url"
                 value={data.personalInfo.social.linkedin}
                 onChange={(e) => updateSocial("linkedin", e.target.value)}
-                placeholder="LinkedIn URL"
+                placeholder="https://linkedin.com/in/username"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">Twitter / X</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="url"
                 value={data.personalInfo.social.twitter}
                 onChange={(e) => updateSocial("twitter", e.target.value)}
-                placeholder="Twitter/X URL"
+                placeholder="https://twitter.com/username"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">Instagram</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="url"
                 value={data.personalInfo.social.instagram}
                 onChange={(e) => updateSocial("instagram", e.target.value)}
-                placeholder="Instagram URL"
+                placeholder="https://instagram.com/username"
               />
             </div>
           </div>
@@ -564,101 +633,51 @@ export default function DashboardPage() {
           <h2 className="h2 article-title">About</h2>
         </header>
 
-        <section className="contact-form-box">
-          <div className="contact-form-wrapper">
-            <h3 className="h3 form-title">Basic Info</h3>
-            <div className="input-wrapper">
-              <input
-                className="form-input"
-                type="text"
-                value={data.personalInfo.name}
-                onChange={(e) => updatePersonalInfo("name", e.target.value)}
-                placeholder="Full Name"
-              />
-              <input
-                className="form-input"
-                type="text"
-                value={data.personalInfo.title}
-                onChange={(e) => updatePersonalInfo("title", e.target.value)}
-                placeholder="Title"
-              />
-              <input
-                className="form-input"
-                type="url"
-                value={data.personalInfo.avatarUrl}
-                onChange={(e) => updatePersonalInfo("avatarUrl", e.target.value)}
-                placeholder="Avatar Image URL"
-              />
-            </div>
+        <section className="dashboard-section">
+          <h3 className="dashboard-section-title">About Me</h3>
+          <div className="dashboard-field">
+            <label className="dashboard-label">Bio / Description</label>
             <textarea
-              className="form-input"
+              className="dashboard-input"
               value={data.personalInfo.about}
               onChange={(e) => updatePersonalInfo("about", e.target.value)}
-              placeholder="About"
+              placeholder="Write a brief description about yourself..."
+              style={{ minHeight: "150px", resize: "vertical" }}
             />
           </div>
         </section>
 
-        <section className="contact-form-box">
-          <div className="contact-form-wrapper">
-            <h3 className="h3 form-title">Stats</h3>
-            <div className="input-wrapper">
+        <section className="dashboard-section">
+          <h3 className="dashboard-section-title">Highlights & Stats</h3>
+          <div className="dashboard-input-grid">
+            <div className="dashboard-field">
+              <label className="dashboard-label">Years of Experience</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="text"
                 value={data.personalInfo.stats.yearsExperience}
                 onChange={(e) => updateStats("yearsExperience", e.target.value)}
-                placeholder="Years of Experience"
+                placeholder="3+"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">Projects Completed</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="text"
                 value={data.personalInfo.stats.projectsCompleted}
                 onChange={(e) => updateStats("projectsCompleted", e.target.value)}
-                placeholder="Projects Completed"
+                placeholder="15+"
               />
+            </div>
+            <div className="dashboard-field">
+              <label className="dashboard-label">Certifications & Awards</label>
               <input
-                className="form-input"
+                className="dashboard-input"
                 type="text"
                 value={data.personalInfo.stats.certificationsAwards}
                 onChange={(e) => updateStats("certificationsAwards", e.target.value)}
-                placeholder="Certifications/Awards"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section className="contact-form-box">
-          <div className="contact-form-wrapper">
-            <h3 className="h3 form-title">Social Links</h3>
-            <div className="input-wrapper">
-              <input
-                className="form-input"
-                type="url"
-                value={data.personalInfo.social.github}
-                onChange={(e) => updateSocial("github", e.target.value)}
-                placeholder="GitHub URL"
-              />
-              <input
-                className="form-input"
-                type="url"
-                value={data.personalInfo.social.linkedin}
-                onChange={(e) => updateSocial("linkedin", e.target.value)}
-                placeholder="LinkedIn URL"
-              />
-              <input
-                className="form-input"
-                type="url"
-                value={data.personalInfo.social.twitter}
-                onChange={(e) => updateSocial("twitter", e.target.value)}
-                placeholder="Twitter/X URL"
-              />
-              <input
-                className="form-input"
-                type="url"
-                value={data.personalInfo.social.instagram}
-                onChange={(e) => updateSocial("instagram", e.target.value)}
-                placeholder="Instagram URL"
+                placeholder="5+"
               />
             </div>
           </div>

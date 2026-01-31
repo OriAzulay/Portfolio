@@ -277,8 +277,21 @@ export async function uploadImageToSupabase(
   folder: "avatar" | "project" | "gallery"
 ): Promise<string | null> {
   try {
+    // Check if Supabase is configured
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      const errorMsg = "Supabase not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local";
+      console.error(errorMsg);
+      alert(errorMsg);
+      return null;
+    }
+
     const fileExt = file.name.split(".").pop()?.toLowerCase() || "png";
     const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+
+    console.log("Uploading to Supabase Storage:", fileName);
 
     const { error: uploadError } = await supabase.storage
       .from("portfolio-images")
@@ -288,7 +301,9 @@ export async function uploadImageToSupabase(
       });
 
     if (uploadError) {
-      console.error("Upload error:", uploadError);
+      const errorMsg = `Upload error: ${uploadError.message}`;
+      console.error("Upload error details:", uploadError);
+      alert(errorMsg);
       return null;
     }
 
@@ -297,9 +312,12 @@ export async function uploadImageToSupabase(
       .from("portfolio-images")
       .getPublicUrl(fileName);
 
+    console.log("Upload successful, URL:", urlData.publicUrl);
     return urlData.publicUrl;
   } catch (error) {
-    console.error("Image upload error:", error);
+    const errorMsg = `Image upload error: ${error instanceof Error ? error.message : String(error)}`;
+    console.error(errorMsg, error);
+    alert(errorMsg);
     return null;
   }
 }
