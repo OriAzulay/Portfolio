@@ -473,6 +473,16 @@ export default function Home() {
                       ),
                     }}
                   />
+                  {item.tags && item.tags.length > 0 && (
+                    <div className="experience-tags">
+                      <span className="experience-tags-label">Tags:</span>
+                      <div className="experience-tags-list">
+                        {item.tags.map((tag, tagIndex) => (
+                          <span key={tagIndex} className="experience-tag">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ol>

@@ -843,6 +843,36 @@ main {
   line-height: 1.6;
 }
 
+/* Experience Tags */
+.experience-tags {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.experience-tags-label {
+  color: var(--light-gray-70);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-400);
+}
+
+.experience-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.experience-tag {
+  background: var(--onyx);
+  color: var(--sky-blue-crayola);
+  font-size: var(--fs-8);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: var(--fw-400);
+}
+
 /**
  * skills
  */

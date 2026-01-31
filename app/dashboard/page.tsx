@@ -226,12 +226,12 @@ export default function DashboardPage() {
       ...prev,
       experience: [
         ...prev.experience,
-        { title: "New Position", company: "Company", period: "20XX - Present", description: "" },
+        { title: "New Position", company: "Company", period: "20XX - Present", description: "", tags: [] },
       ],
     }));
   };
 
-  const updateExperience = (index: number, field: keyof Experience, value: string) => {
+  const updateExperience = (index: number, field: keyof Experience, value: string | string[]) => {
     setData((prev) => ({
       ...prev,
       experience: prev.experience.map((exp, i) =>
@@ -726,6 +726,45 @@ export default function DashboardPage() {
                   value={exp.description}
                   onChange={(value) => updateExperience(index, "description", value)}
                 />
+                <div className="dashboard-field" style={{ marginTop: "16px" }}>
+                  <label className="dashboard-label">Tags</label>
+                  <div className="tags-container">
+                    {(exp.tags || []).map((tag, tagIndex) => (
+                      <span key={tagIndex} className="tag-chip">
+                        {tag}
+                        <button
+                          type="button"
+                          className="tag-remove"
+                          onClick={() => {
+                            const newTags = (exp.tags || []).filter((_, i) => i !== tagIndex);
+                            updateExperience(index, "tags", newTags);
+                          }}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      className="tag-input"
+                      type="text"
+                      placeholder="Add tag + Enter"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const input = e.currentTarget;
+                          const newTag = input.value.trim();
+                          if (newTag && !(exp.tags || []).includes(newTag)) {
+                            updateExperience(index, "tags", [...(exp.tags || []), newTag]);
+                            input.value = "";
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                  <p style={{ fontSize: "11px", color: "var(--light-gray-70)", marginTop: "6px" }}>
+                    Press Enter to add a tag. Click × to remove.
+                  </p>
+                </div>
                 <div className="buttonContainer">
                   <button className="toolBtn" type="button" onClick={() => removeExperience(index)}>
                     Remove

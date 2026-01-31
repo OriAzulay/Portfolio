@@ -32,6 +32,7 @@ export interface Experience {
   company: string;
   period: string;
   description: string;
+  tags: string[];
 }
 
 export interface Education {
@@ -106,12 +107,14 @@ high-quality, scalable solutions that make a real impact.`,
       company: "Company Name",
       period: "2023 - Present",
       description: "Developing and maintaining web applications using React and Node.js.",
+      tags: ["React", "Node.js", "TypeScript"],
     },
     {
       title: "Junior Developer",
       company: "Previous Company",
       period: "2021 - 2023",
       description: "Built responsive web interfaces and collaborated with cross-functional teams.",
+      tags: ["JavaScript", "CSS", "HTML"],
     },
   ],
   education: [
