@@ -1,8 +1,50 @@
 /* Minifier: https://www.cleancss.com/css-minify/ */
 
 /*-----------------------------------*\
-  #FONTS (loaded via Next.js in layout.tsx)
+  #ADD FONTS
 \*-----------------------------------*/
+
+/* courgette-regular - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Courgette';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/assets/fonts/courgette/courgette-v18-latin-regular.woff2') format('woff2');
+}
+
+/* poppins-300 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 300;
+  src: url('/assets/fonts/poppins/poppins-v23-latin-300.woff2') format('woff2');
+}
+/* poppins-regular - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/assets/fonts/poppins/poppins-v23-latin-regular.woff2') format('woff2');
+}
+/* poppins-500 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  src: url('/assets/fonts/poppins/poppins-v23-latin-500.woff2') format('woff2');
+}
+/* poppins-600 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  src: url('/assets/fonts/poppins/poppins-v23-latin-600.woff2') format('woff2');
+}
 
 
 /*-----------------------------------*\
@@ -69,7 +111,7 @@
    */
 
   /* font-family */
-  --ff-poppins: var(--font-poppins), "Poppins", sans-serif;
+  --ff-poppins: "Poppins", sans-serif;
 
   /* font-size */
   --fs-1: 24px;
@@ -359,8 +401,6 @@ main {
   justify-content: flex-start;
   align-items: center;
   gap: 15px;
-  width: 100%;
-  overflow: hidden;
 }
 
 .avatar-box {
@@ -368,14 +408,10 @@ main {
   overflow: hidden;
   border-radius: 10px;
   cursor: pointer;
-  flex-shrink: 0;
 }
 
 .avatar-box img {
   background: var(--bg-gradient-onyx);
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
 }
 
 /* Fullscreen modal */
@@ -411,20 +447,11 @@ main {
   transform: scale(1);
 }
 
-.info-content {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-}
-
 .info-content .name {
   color: var(--white-2);
   font-size: var(--fs-2);
   font-weight: var(--fw-500);
   margin-bottom: 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .info-content .title {
@@ -433,12 +460,8 @@ main {
   font-size: var(--fs-8);
   font-weight: var(--fw-300);
   width: max-content;
-  max-width: 100%;
   padding: 3px 12px;
   border-radius: 8px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .info-content h1:focus {
@@ -447,7 +470,7 @@ main {
 }
 
 .courgette-head h1 {
-  font-family: var(--font-courgette), "Courgette", Comic Sans MS;
+  font-family: "Courgette", Comic Sans MS;
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
@@ -841,36 +864,6 @@ main {
   color: var(--light-gray);
   font-weight: var(--fw-300);
   line-height: 1.6;
-}
-
-/* Experience Tags */
-.experience-tags {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-.experience-tags-label {
-  color: var(--light-gray-70);
-  font-size: var(--fs-7);
-  font-weight: var(--fw-400);
-}
-
-.experience-tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.experience-tag {
-  background: var(--onyx);
-  color: var(--sky-blue-crayola);
-  font-size: var(--fs-8);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: var(--fw-400);
 }
 
 /**
@@ -1688,7 +1681,7 @@ footer {
     left: 15px;
     font-size: 1.5rem;
     text-shadow: 0 0 20px rgba(255, 255, 255, 1);
-    font-family: var(--font-courgette), 'Courgette', cursive;
+    font-family: 'Courgette';
     background: rgba(0, 0, 0, 0.5);
     color: white;
     box-shadow: 0px 0px 30px 30px rgb(0 0 0 / 50%);
@@ -1791,13 +1784,6 @@ footer {
   #ADMIN DASHBOARD
 \*-----------------------------------*/
 
-/* Override sidebar styles for dashboard */
-article.sidebar.active {
-  display: block;
-  max-height: none;
-  overflow: visible;
-}
-
 .admin-topbar {
   background: var(--eerie-black-2);
   border: 1px solid var(--jet);
@@ -1856,148 +1842,6 @@ article.sidebar.active {
 
 .admin-btn.danger {
   color: var(--bittersweet-shimmer);
-}
-
-/* Dashboard form sections - improved layout */
-.dashboard-section {
-  background: var(--eerie-black-1);
-  border: 1px solid var(--jet);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.dashboard-section-title {
-  color: var(--sky-blue-crayola);
-  font-size: var(--fs-5);
-  font-weight: var(--fw-500);
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--jet);
-}
-
-/* Dashboard input grid - single column on mobile, responsive */
-.dashboard-input-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
-}
-
-/* Dashboard input with label */
-.dashboard-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-}
-
-.dashboard-label {
-  color: var(--light-gray-70);
-  font-size: var(--fs-8);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.dashboard-input {
-  width: 100%;
-  padding: 12px 16px;
-  background: var(--eerie-black-2);
-  border: 1px solid var(--jet);
-  border-radius: 10px;
-  color: var(--white-2);
-  font-size: var(--fs-6);
-  transition: border-color var(--transition-1);
-}
-
-.dashboard-input:focus {
-  border-color: var(--sky-blue-crayola);
-  outline: none;
-}
-
-.dashboard-input::placeholder {
-  color: var(--light-gray-70);
-  opacity: 0.6;
-}
-
-/* Two column layout on larger screens */
-@media (min-width: 600px) {
-  .dashboard-input-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-  
-  .dashboard-field.full-width {
-    grid-column: 1 / -1;
-  }
-}
-
-/* Improve dashboard section spacing */
-.dashboard-section + .dashboard-section {
-  margin-top: 24px;
-}
-
-/* Tag input styles */
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px 12px;
-  background: var(--eerie-black-2);
-  border: 1px solid var(--jet);
-  border-radius: 10px;
-  min-height: 48px;
-  align-items: center;
-}
-
-.tag-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg-gradient-onyx);
-  color: var(--sky-blue-crayola);
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: var(--fs-7);
-  font-weight: var(--fw-400);
-  border: 1px solid var(--jet);
-}
-
-.tag-remove {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  background: transparent;
-  color: var(--light-gray-70);
-  font-size: 14px;
-  line-height: 1;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: var(--transition-1);
-}
-
-.tag-remove:hover {
-  background: var(--bittersweet-shimmer);
-  color: var(--white-1);
-}
-
-.tag-input {
-  flex: 1;
-  min-width: 100px;
-  background: transparent;
-  border: none;
-  color: var(--white-2);
-  font-size: var(--fs-6);
-  padding: 4px 0;
-  outline: none;
-}
-
-.tag-input::placeholder {
-  color: var(--light-gray-70);
-  opacity: 0.6;
 }
 
 /* Simple rich text editor */
@@ -2166,28 +2010,14 @@ article.sidebar.active {
   .avatar-box img {
     background: var(--bg-gradient-onyx);
     width: 120px;
-    height: 120px;
-  }
-
-  .info-content {
-    flex: unset;
-    min-width: unset;
-    overflow: visible;
   }
 
   .info-content .name {
     margin-bottom: 15px;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
   }
 
   .info-content .title {
     padding: 5px 18px;
-    max-width: unset;
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
   }
 
   .info_more-btn {
@@ -2573,14 +2403,11 @@ article.sidebar.active {
   .avatar-box img {
     background: var(--bg-gradient-onyx);
     width: 170px;
-    height: 170px;
   }
 
   .info-content .name {
     white-space: nowrap;
     text-align: center;
-    overflow: visible;
-    text-overflow: clip;
   }
 
   .info-content .title {

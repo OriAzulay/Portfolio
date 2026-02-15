@@ -30,7 +30,7 @@ describe('Portfolio Data Types', () => {
       expect(typeof personalInfo.phone).toBe('string')
       expect(typeof personalInfo.location).toBe('string')
       expect(typeof personalInfo.about).toBe('string')
-      expect(personalInfo.qrCodeUrl).toBeDefined()
+      expect(typeof personalInfo.avatarUrl).toBe('string')
     })
 
     it('should have valid social links structure', () => {
@@ -70,7 +70,6 @@ describe('Portfolio Data Types', () => {
         expect(typeof exp.company).toBe('string')
         expect(typeof exp.period).toBe('string')
         expect(typeof exp.description).toBe('string')
-        expect(Array.isArray(exp.tags)).toBe(true)
       })
     })
 
@@ -92,7 +91,7 @@ describe('Portfolio Data Types', () => {
         expect(typeof project.description).toBe('string')
         expect(Array.isArray(project.tags)).toBe(true)
         expect(typeof project.link).toBe('string')
-        expect(project.imageUrl).toBeDefined()
+        expect(typeof project.imageUrl).toBe('string')
       })
     })
 
@@ -102,7 +101,7 @@ describe('Portfolio Data Types', () => {
       defaultPortfolioData.gallery.forEach((item) => {
         expect(typeof item.title).toBe('string')
         expect(typeof item.description).toBe('string')
-        expect(item.imageUrl).toBeDefined()
+        expect(typeof item.imageUrl).toBe('string')
       })
     })
   })

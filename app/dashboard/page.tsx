@@ -8,9 +8,6 @@ import {
   defaultPortfolioData,
   getPortfolioData,
   savePortfolioData,
-  fetchPortfolioFromSupabase,
-  savePortfolioToSupabase,
-  uploadImageToSupabase,
   Skill,
   Experience,
   Education,
@@ -123,37 +120,18 @@ export default function DashboardPage() {
       router.push("/login");
       return;
     }
-    
-    // Load data from Supabase (with localStorage fallback)
-    const loadData = async () => {
-      try {
-        const portfolioData = await fetchPortfolioFromSupabase();
-        setData(portfolioData);
-      } catch (error) {
-        console.error("Failed to load from Supabase, using localStorage:", error);
-        setData(getPortfolioData());
-      }
-      setLoading(false);
-    };
-    
-    loadData();
+    setData(getPortfolioData());
+    setLoading(false);
   }, [router]);
 
-  const handleSave = async () => {
+  const handleSave = () => {
     setSaving(true);
-    
-    // Save to both Supabase and localStorage
-    const success = await savePortfolioToSupabase(data);
-    
-    if (!success) {
-      // Fallback: save to localStorage only
-      savePortfolioData(data);
-      console.warn("Saved to localStorage only (Supabase unavailable)");
-    }
-    
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    savePortfolioData(data);
+    setTimeout(() => {
+      setSaving(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    }, 500);
   };
 
   const handleLogout = () => {
@@ -226,12 +204,12 @@ export default function DashboardPage() {
       ...prev,
       experience: [
         ...prev.experience,
-        { title: "New Position", company: "Company", period: "20XX - Present", description: "", tags: [] },
+        { title: "New Position", company: "Company", period: "20XX - Present", description: "" },
       ],
     }));
   };
 
-  const updateExperience = (index: number, field: keyof Experience, value: string | string[]) => {
+  const updateExperience = (index: number, field: keyof Experience, value: string) => {
     setData((prev) => ({
       ...prev,
       experience: prev.experience.map((exp, i) =>
@@ -347,14 +325,31 @@ export default function DashboardPage() {
     .map((part) => part.charAt(0))
     .join("");
   const encodeText = (text: string) => encodeURIComponent(text);
-  
-  // Upload file to Supabase Storage
   const uploadFile = async (file: File, kind: "avatar" | "project" | "gallery") => {
-    const url = await uploadImageToSupabase(file, kind);
-    if (!url) {
+    const adminPassword =
+      typeof window !== "undefined" ? sessionStorage.getItem("admin_password") : null;
+    if (!adminPassword) {
+      throw new Error("Missing admin password");
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("kind", kind);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      headers: {
+        "x-admin-password": adminPassword,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
       throw new Error("Upload failed");
     }
-    return url;
+
+    const data = await response.json();
+    return data.url as string;
   };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -362,17 +357,7 @@ export default function DashboardPage() {
     if (!file) return;
     try {
       const url = await uploadFile(file, "avatar");
-      // Update state and auto-save
-      setData((prev) => {
-        const newData = {
-          ...prev,
-          personalInfo: { ...prev.personalInfo, avatarUrl: url },
-        };
-        // Auto-save to Supabase
-        savePortfolioToSupabase(newData);
-        return newData;
-      });
-      alert("Avatar uploaded and saved!");
+      updatePersonalInfo("avatarUrl", url);
     } catch {
       alert("Avatar upload failed.");
     }
@@ -386,19 +371,7 @@ export default function DashboardPage() {
     if (!file) return;
     try {
       const url = await uploadFile(file, "project");
-      // Update state and auto-save
-      setData((prev) => {
-        const newData = {
-          ...prev,
-          projects: prev.projects.map((proj, i) =>
-            i === index ? { ...proj, imageUrl: url } : proj
-          ),
-        };
-        // Auto-save to Supabase
-        savePortfolioToSupabase(newData);
-        return newData;
-      });
-      alert("Project image uploaded and saved!");
+      updateProject(index, "imageUrl", url);
     } catch {
       alert("Project image upload failed.");
     }
@@ -412,19 +385,7 @@ export default function DashboardPage() {
     if (!file) return;
     try {
       const url = await uploadFile(file, "gallery");
-      // Update state and auto-save
-      setData((prev) => {
-        const newData = {
-          ...prev,
-          gallery: prev.gallery.map((item, i) =>
-            i === index ? { ...item, imageUrl: url } : item
-          ),
-        };
-        // Auto-save to Supabase
-        savePortfolioToSupabase(newData);
-        return newData;
-      });
-      alert("Gallery image uploaded and saved!");
+      updateGalleryItem(index, "imageUrl", url);
     } catch {
       alert("Gallery image upload failed.");
     }
@@ -482,146 +443,111 @@ export default function DashboardPage() {
           <h2 className="h2 article-title">Sidebar</h2>
         </header>
 
-        <section className="dashboard-section">
-          <h3 className="dashboard-section-title">Profile</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-              <div className="avatar-box" style={{ width: "100px", height: "100px", flexShrink: 0 }}>
-                <img
-                  src={
-                    data.personalInfo.avatarUrl
-                      ? data.personalInfo.avatarUrl
-                      : `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><rect width='100%' height='100%' fill='%23222222'/><text x='50%' y='55%' text-anchor='middle' font-size='64' fill='%23ffffff' font-family='Poppins,Arial'>${encodeText(initials)}</text></svg>`
-                  }
-                  alt="Avatar preview"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              </div>
-              <div style={{ flex: 1, minWidth: "200px" }}>
-                <label className="toolBtn" style={{ display: "inline-flex", marginBottom: "10px" }}>
-                  Upload Avatar
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                    style={{ display: "none" }}
-                  />
-                </label>
-              </div>
+        <section className="contact-form-box">
+          <div className="contact-form-wrapper">
+            <h3 className="h3 form-title">Profile</h3>
+            <div className="avatar-box" style={{ width: "140px" }}>
+              <img
+                src={
+                  data.personalInfo.avatarUrl
+                    ? data.personalInfo.avatarUrl
+                    : `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><rect width='100%' height='100%' fill='%23222222'/><text x='50%' y='55%' text-anchor='middle' font-size='64' fill='%23ffffff' font-family='Poppins,Arial'>${encodeText(initials)}</text></svg>`
+                }
+                alt="Avatar preview"
+              />
             </div>
-            
-            <div className="dashboard-input-grid">
-              <div className="dashboard-field">
-                <label className="dashboard-label">Avatar URL</label>
-                <input
-                  className="dashboard-input"
-                  type="url"
-                  value={data.personalInfo.avatarUrl}
-                  onChange={(e) => updatePersonalInfo("avatarUrl", e.target.value)}
-                  placeholder="https://example.com/avatar.jpg"
-                />
-              </div>
-              <div className="dashboard-field">
-                <label className="dashboard-label">Full Name</label>
-                <input
-                  className="dashboard-input"
-                  type="text"
-                  value={data.personalInfo.name}
-                  onChange={(e) => updatePersonalInfo("name", e.target.value)}
-                  placeholder="John Doe"
-                />
-              </div>
-              <div className="dashboard-field">
-                <label className="dashboard-label">Title / Role</label>
-                <input
-                  className="dashboard-input"
-                  type="text"
-                  value={data.personalInfo.title}
-                  onChange={(e) => updatePersonalInfo("title", e.target.value)}
-                  placeholder="Software Developer"
-                />
-              </div>
+            <div className="input-wrapper">
+              <input
+                className="form-input"
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+              />
+              <input
+                className="form-input"
+                type="url"
+                value={data.personalInfo.avatarUrl}
+                onChange={(e) => updatePersonalInfo("avatarUrl", e.target.value)}
+                placeholder="Avatar Image URL"
+              />
+              <input
+                className="form-input"
+                type="text"
+                value={data.personalInfo.name}
+                onChange={(e) => updatePersonalInfo("name", e.target.value)}
+                placeholder="Full Name"
+              />
+              <input
+                className="form-input"
+                type="text"
+                value={data.personalInfo.title}
+                onChange={(e) => updatePersonalInfo("title", e.target.value)}
+                placeholder="Title"
+              />
             </div>
           </div>
         </section>
 
-        <section className="dashboard-section">
-          <h3 className="dashboard-section-title">Contact Information</h3>
-          <div className="dashboard-input-grid">
-            <div className="dashboard-field">
-              <label className="dashboard-label">Email Address</label>
+        <section className="contact-form-box">
+          <div className="contact-form-wrapper">
+            <h3 className="h3 form-title">Sidebar Contacts</h3>
+            <div className="input-wrapper">
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="email"
                 value={data.personalInfo.email}
                 onChange={(e) => updatePersonalInfo("email", e.target.value)}
-                placeholder="your.email@example.com"
+                placeholder="Email"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">Phone Number</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="text"
                 value={data.personalInfo.phone}
                 onChange={(e) => updatePersonalInfo("phone", e.target.value)}
-                placeholder="+1 234 567 8900"
+                placeholder="Phone"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">Location</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="text"
                 value={data.personalInfo.location}
                 onChange={(e) => updatePersonalInfo("location", e.target.value)}
-                placeholder="City, Country"
+                placeholder="Location"
               />
             </div>
           </div>
         </section>
 
-        <section className="dashboard-section">
-          <h3 className="dashboard-section-title">Social Links</h3>
-          <div className="dashboard-input-grid">
-            <div className="dashboard-field">
-              <label className="dashboard-label">GitHub</label>
+        <section className="contact-form-box">
+          <div className="contact-form-wrapper">
+            <h3 className="h3 form-title">Social Links</h3>
+            <div className="input-wrapper">
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="url"
                 value={data.personalInfo.social.github}
                 onChange={(e) => updateSocial("github", e.target.value)}
-                placeholder="https://github.com/username"
+                placeholder="GitHub URL"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">LinkedIn</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="url"
                 value={data.personalInfo.social.linkedin}
                 onChange={(e) => updateSocial("linkedin", e.target.value)}
-                placeholder="https://linkedin.com/in/username"
+                placeholder="LinkedIn URL"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">Twitter / X</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="url"
                 value={data.personalInfo.social.twitter}
                 onChange={(e) => updateSocial("twitter", e.target.value)}
-                placeholder="https://twitter.com/username"
+                placeholder="Twitter/X URL"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">Instagram</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="url"
                 value={data.personalInfo.social.instagram}
                 onChange={(e) => updateSocial("instagram", e.target.value)}
-                placeholder="https://instagram.com/username"
+                placeholder="Instagram URL"
               />
             </div>
           </div>
@@ -633,51 +559,101 @@ export default function DashboardPage() {
           <h2 className="h2 article-title">About</h2>
         </header>
 
-        <section className="dashboard-section">
-          <h3 className="dashboard-section-title">About Me</h3>
-          <div className="dashboard-field">
-            <label className="dashboard-label">Bio / Description</label>
+        <section className="contact-form-box">
+          <div className="contact-form-wrapper">
+            <h3 className="h3 form-title">Basic Info</h3>
+            <div className="input-wrapper">
+              <input
+                className="form-input"
+                type="text"
+                value={data.personalInfo.name}
+                onChange={(e) => updatePersonalInfo("name", e.target.value)}
+                placeholder="Full Name"
+              />
+              <input
+                className="form-input"
+                type="text"
+                value={data.personalInfo.title}
+                onChange={(e) => updatePersonalInfo("title", e.target.value)}
+                placeholder="Title"
+              />
+              <input
+                className="form-input"
+                type="url"
+                value={data.personalInfo.avatarUrl}
+                onChange={(e) => updatePersonalInfo("avatarUrl", e.target.value)}
+                placeholder="Avatar Image URL"
+              />
+            </div>
             <textarea
-              className="dashboard-input"
+              className="form-input"
               value={data.personalInfo.about}
               onChange={(e) => updatePersonalInfo("about", e.target.value)}
-              placeholder="Write a brief description about yourself..."
-              style={{ minHeight: "150px", resize: "vertical" }}
+              placeholder="About"
             />
           </div>
         </section>
 
-        <section className="dashboard-section">
-          <h3 className="dashboard-section-title">Highlights & Stats</h3>
-          <div className="dashboard-input-grid">
-            <div className="dashboard-field">
-              <label className="dashboard-label">Years of Experience</label>
+        <section className="contact-form-box">
+          <div className="contact-form-wrapper">
+            <h3 className="h3 form-title">Stats</h3>
+            <div className="input-wrapper">
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="text"
                 value={data.personalInfo.stats.yearsExperience}
                 onChange={(e) => updateStats("yearsExperience", e.target.value)}
-                placeholder="3+"
+                placeholder="Years of Experience"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">Projects Completed</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="text"
                 value={data.personalInfo.stats.projectsCompleted}
                 onChange={(e) => updateStats("projectsCompleted", e.target.value)}
-                placeholder="15+"
+                placeholder="Projects Completed"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">Certifications & Awards</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="text"
                 value={data.personalInfo.stats.certificationsAwards}
                 onChange={(e) => updateStats("certificationsAwards", e.target.value)}
-                placeholder="5+"
+                placeholder="Certifications/Awards"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="contact-form-box">
+          <div className="contact-form-wrapper">
+            <h3 className="h3 form-title">Social Links</h3>
+            <div className="input-wrapper">
+              <input
+                className="form-input"
+                type="url"
+                value={data.personalInfo.social.github}
+                onChange={(e) => updateSocial("github", e.target.value)}
+                placeholder="GitHub URL"
+              />
+              <input
+                className="form-input"
+                type="url"
+                value={data.personalInfo.social.linkedin}
+                onChange={(e) => updateSocial("linkedin", e.target.value)}
+                placeholder="LinkedIn URL"
+              />
+              <input
+                className="form-input"
+                type="url"
+                value={data.personalInfo.social.twitter}
+                onChange={(e) => updateSocial("twitter", e.target.value)}
+                placeholder="Twitter/X URL"
+              />
+              <input
+                className="form-input"
+                type="url"
+                value={data.personalInfo.social.instagram}
+                onChange={(e) => updateSocial("instagram", e.target.value)}
+                placeholder="Instagram URL"
               />
             </div>
           </div>
@@ -698,7 +674,7 @@ export default function DashboardPage() {
               </button>
             </div>
             {data.experience.map((exp, index) => (
-              <div className="content-card" key={`exp-${index}`}>
+              <div className="content-card" key={`${exp.company}-${index}`}>
                 <div className="input-wrapper">
                   <input
                     className="form-input"
@@ -726,45 +702,6 @@ export default function DashboardPage() {
                   value={exp.description}
                   onChange={(value) => updateExperience(index, "description", value)}
                 />
-                <div className="dashboard-field" style={{ marginTop: "16px" }}>
-                  <label className="dashboard-label">Tags</label>
-                  <div className="tags-container">
-                    {(exp.tags || []).map((tag, tagIndex) => (
-                      <span key={tagIndex} className="tag-chip">
-                        {tag}
-                        <button
-                          type="button"
-                          className="tag-remove"
-                          onClick={() => {
-                            const newTags = (exp.tags || []).filter((_, i) => i !== tagIndex);
-                            updateExperience(index, "tags", newTags);
-                          }}
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                    <input
-                      className="tag-input"
-                      type="text"
-                      placeholder="Add tag + Enter"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          const input = e.currentTarget;
-                          const newTag = input.value.trim();
-                          if (newTag && !(exp.tags || []).includes(newTag)) {
-                            updateExperience(index, "tags", [...(exp.tags || []), newTag]);
-                            input.value = "";
-                          }
-                        }
-                      }}
-                    />
-                  </div>
-                  <p style={{ fontSize: "11px", color: "var(--light-gray-70)", marginTop: "6px" }}>
-                    Press Enter to add a tag. Click × to remove.
-                  </p>
-                </div>
                 <div className="buttonContainer">
                   <button className="toolBtn" type="button" onClick={() => removeExperience(index)}>
                     Remove
@@ -784,7 +721,7 @@ export default function DashboardPage() {
               </button>
             </div>
             {data.education.map((edu, index) => (
-              <div className="content-card" key={`edu-${index}`}>
+              <div className="content-card" key={`${edu.school}-${index}`}>
                 <div className="input-wrapper">
                   <input
                     className="form-input"
@@ -827,7 +764,7 @@ export default function DashboardPage() {
               </button>
             </div>
             {data.skills.map((skill, index) => (
-              <div className="content-card" key={`skill-${index}`}>
+              <div className="content-card" key={`${skill.name}-${index}`}>
                 <div className="input-wrapper">
                   <input
                     className="form-input"
@@ -872,39 +809,20 @@ export default function DashboardPage() {
           <h2 className="h2 article-title">Projects</h2>
         </header>
 
-        <section className="dashboard-section">
-          <div className="buttonContainer" style={{ marginBottom: "20px" }}>
-            <button className="toolBtn" type="button" onClick={addProject}>
-              + Add Project
-            </button>
-          </div>
-          {data.projects.map((project, index) => (
-            <div className="dashboard-section" key={`project-${index}`} style={{ marginBottom: "20px", background: "var(--eerie-black-2)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                <h4 style={{ color: "var(--white-2)", fontSize: "var(--fs-5)" }}>
-                  {project.title || `Project ${index + 1}`}
-                </h4>
-                <button 
-                  className="toolBtn" 
-                  type="button" 
-                  onClick={() => removeProject(index)}
-                  style={{ color: "var(--bittersweet-shimmer)" }}
-                >
-                  Remove
-                </button>
-              </div>
-              
-              <div className="dashboard-input-grid">
-                <div className="dashboard-field">
-                  <label className="dashboard-label">Project Image</label>
-                  <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-                    {project.imageUrl && (
-                      <img 
-                        src={project.imageUrl} 
-                        alt="Preview" 
-                        style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px" }}
-                      />
-                    )}
+        <section className="contact-form-box">
+          <div className="contact-form-wrapper">
+            <div className="buttonContainer">
+              <button className="toolBtn" type="button" onClick={addProject}>
+                Add Project
+              </button>
+            </div>
+            {data.projects.map((project, index) => (
+              <div className="content-card" key={`${project.title}-${index}`}>
+                <div className="input-wrapper">
+                  <div>
+                    <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "6px" }}>
+                      Project image
+                    </div>
                     <label className="toolBtn" style={{ display: "inline-flex" }}>
                       Upload Image
                       <input
@@ -915,81 +833,48 @@ export default function DashboardPage() {
                       />
                     </label>
                   </div>
-                </div>
-                <div className="dashboard-field">
-                  <label className="dashboard-label">Project Title</label>
                   <input
-                    className="dashboard-input"
+                    className="form-input"
                     type="text"
                     value={project.title}
                     onChange={(e) => updateProject(index, "title", e.target.value)}
-                    placeholder="My Awesome Project"
+                    placeholder="Project Title"
                   />
-                </div>
-                <div className="dashboard-field">
-                  <label className="dashboard-label">Project Link</label>
                   <input
-                    className="dashboard-input"
+                    className="form-input"
                     type="url"
                     value={project.link}
                     onChange={(e) => updateProject(index, "link", e.target.value)}
-                    placeholder="https://example.com"
+                    placeholder="Project Link"
                   />
                 </div>
-              </div>
-              
-              <div className="dashboard-field" style={{ marginTop: "16px" }}>
-                <label className="dashboard-label">Description</label>
                 <textarea
-                  className="dashboard-input"
+                  className="form-input"
                   value={project.description}
                   onChange={(e) => updateProject(index, "description", e.target.value)}
-                  placeholder="Describe your project..."
-                  style={{ minHeight: "80px", resize: "vertical" }}
+                  placeholder="Project Description"
                 />
-              </div>
-              
-              <div className="dashboard-field" style={{ marginTop: "16px" }}>
-                <label className="dashboard-label">Tags</label>
-                <div className="tags-container">
-                  {project.tags.map((tag, tagIndex) => (
-                    <span key={tagIndex} className="tag-chip">
-                      {tag}
-                      <button
-                        type="button"
-                        className="tag-remove"
-                        onClick={() => {
-                          const newTags = project.tags.filter((_, i) => i !== tagIndex);
-                          updateProject(index, "tags", newTags);
-                        }}
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                  <input
-                    className="tag-input"
-                    type="text"
-                    placeholder="Add tag + Enter"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        const input = e.currentTarget;
-                        const newTag = input.value.trim();
-                        if (newTag && !project.tags.includes(newTag)) {
-                          updateProject(index, "tags", [...project.tags, newTag]);
-                          input.value = "";
-                        }
-                      }
-                    }}
-                  />
+                <input
+                  className="form-input"
+                  type="text"
+                  value={project.tags.join(", ")}
+                  onChange={(e) =>
+                    updateProject(
+                      index,
+                      "tags",
+                      e.target.value.split(",").map((t) => t.trim()).filter(Boolean)
+                    )
+                  }
+                  placeholder="Tags (comma-separated)"
+                />
+                <div className="buttonContainer">
+                  <button className="toolBtn" type="button" onClick={() => removeProject(index)}>
+                    Remove
+                  </button>
                 </div>
-                <p style={{ fontSize: "11px", color: "var(--light-gray-70)", marginTop: "6px" }}>
-                  Press Enter to add a tag. Click × to remove.
-                </p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </section>
       </article>
 
@@ -998,137 +883,31 @@ export default function DashboardPage() {
           <h2 className="h2 article-title">Contact</h2>
         </header>
 
-        <section className="dashboard-section">
-          <h3 className="dashboard-section-title">Contact Information</h3>
-          <div className="dashboard-input-grid">
-            <div className="dashboard-field">
-              <label className="dashboard-label">Email Address</label>
+        <section className="contact-form-box">
+          <div className="contact-form-wrapper">
+            <div className="input-wrapper">
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="email"
                 value={data.personalInfo.email}
                 onChange={(e) => updatePersonalInfo("email", e.target.value)}
-                placeholder="your.email@example.com"
+                placeholder="Email"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">Phone Number</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="text"
                 value={data.personalInfo.phone}
                 onChange={(e) => updatePersonalInfo("phone", e.target.value)}
-                placeholder="+1 234 567 8900"
+                placeholder="Phone"
               />
-            </div>
-            <div className="dashboard-field">
-              <label className="dashboard-label">Location</label>
               <input
-                className="dashboard-input"
+                className="form-input"
                 type="text"
                 value={data.personalInfo.location}
                 onChange={(e) => updatePersonalInfo("location", e.target.value)}
-                placeholder="City, Country"
+                placeholder="Location"
               />
             </div>
-          </div>
-        </section>
-
-        <section className="dashboard-section">
-          <h3 className="dashboard-section-title">QR Code</h3>
-          <p style={{ fontSize: "12px", color: "var(--light-gray-70)", marginBottom: "16px" }}>
-            Upload a QR code image that visitors can scan (e.g., link to your vCard, LinkedIn, or website)
-          </p>
-          <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-            {data.personalInfo.qrCodeUrl ? (
-              <div style={{ 
-                width: "120px", 
-                height: "120px", 
-                borderRadius: "12px", 
-                overflow: "hidden",
-                border: "1px solid var(--jet)",
-                background: "var(--eerie-black-2)"
-              }}>
-                <img
-                  src={data.personalInfo.qrCodeUrl}
-                  alt="QR Code preview"
-                  style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                />
-              </div>
-            ) : (
-              <div style={{ 
-                width: "120px", 
-                height: "120px", 
-                borderRadius: "12px", 
-                border: "1px dashed var(--jet)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--light-gray-70)",
-                fontSize: "12px",
-                textAlign: "center",
-                padding: "10px"
-              }}>
-                No QR Code
-              </div>
-            )}
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <label className="toolBtn" style={{ display: "inline-flex" }}>
-                Upload QR Code
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    try {
-                      const url = await uploadFile(file, "avatar");
-                      setData((prev) => {
-                        const newData = {
-                          ...prev,
-                          personalInfo: { ...prev.personalInfo, qrCodeUrl: url },
-                        };
-                        savePortfolioToSupabase(newData);
-                        return newData;
-                      });
-                      alert("QR Code uploaded and saved!");
-                    } catch {
-                      alert("QR Code upload failed.");
-                    }
-                  }}
-                  style={{ display: "none" }}
-                />
-              </label>
-              {data.personalInfo.qrCodeUrl && (
-                <button
-                  type="button"
-                  className="toolBtn"
-                  style={{ color: "var(--bittersweet-shimmer)" }}
-                  onClick={() => {
-                    setData((prev) => {
-                      const newData = {
-                        ...prev,
-                        personalInfo: { ...prev.personalInfo, qrCodeUrl: "" },
-                      };
-                      savePortfolioToSupabase(newData);
-                      return newData;
-                    });
-                  }}
-                >
-                  Remove QR Code
-                </button>
-              )}
-            </div>
-          </div>
-          <div className="dashboard-field" style={{ marginTop: "16px" }}>
-            <label className="dashboard-label">Or paste QR Code URL</label>
-            <input
-              className="dashboard-input"
-              type="url"
-              value={data.personalInfo.qrCodeUrl || ""}
-              onChange={(e) => updatePersonalInfo("qrCodeUrl", e.target.value)}
-              placeholder="https://example.com/qr-code.png"
-            />
           </div>
         </section>
       </article>
@@ -1146,7 +925,7 @@ export default function DashboardPage() {
               </button>
             </div>
             {(data.gallery ?? []).map((item, index) => (
-              <div className="content-card" key={`gallery-${index}`}>
+              <div className="content-card" key={`${item.title}-${index}`}>
                 <div className="input-wrapper">
                   <div>
                     <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "6px" }}>

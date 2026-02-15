@@ -6,7 +6,6 @@ import {
   PortfolioData,
   defaultPortfolioData,
   getPortfolioData,
-  fetchPortfolioFromSupabase,
 } from "./lib/portfolio-data";
 
 const Icons = {
@@ -84,128 +83,11 @@ function usePortfolioData() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Try to fetch from Supabase first
-        const portfolioData = await fetchPortfolioFromSupabase();
-        setData(portfolioData);
-      } catch (error) {
-        // Fallback to localStorage if Supabase fails
-        console.error("Supabase fetch failed, using localStorage:", error);
-        setData(getPortfolioData());
-      }
-      setMounted(true);
-    };
-
-    loadData();
+    setData(getPortfolioData());
+    setMounted(true);
   }, []);
 
   return { data, mounted };
-}
-
-// Contact Form Component
-function ContactForm({ recipientEmail }: { recipientEmail: string }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.message) {
-      setErrorMessage("Please fill in all fields");
-      setStatus("error");
-      return;
-    }
-
-    setStatus("sending");
-    setErrorMessage("");
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          recipientEmail,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to send message");
-      }
-
-      setStatus("success");
-      setFormData({ name: "", email: "", message: "" });
-      
-      // Reset to idle after 5 seconds
-      setTimeout(() => setStatus("idle"), 5000);
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Failed to send message");
-      setStatus("error");
-    }
-  };
-
-  return (
-    <section className="contact-form-box">
-      <div className="contact-form-wrapper">
-        <h3 className="h3 form-title">Contact Form</h3>
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <div className="input-wrapper">
-            <input
-              className="form-input"
-              type="text"
-              placeholder="Full Name"
-              value={formData.name}
-              onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-              disabled={status === "sending"}
-            />
-            <input
-              className="form-input"
-              type="email"
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-              disabled={status === "sending"}
-            />
-          </div>
-          <textarea
-            className="form-input"
-            placeholder="Your Message"
-            value={formData.message}
-            onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-            disabled={status === "sending"}
-          />
-          
-          {status === "error" && (
-            <p style={{ color: "var(--bittersweet-shimmer)", fontSize: "14px", marginBottom: "15px" }}>
-              {errorMessage}
-            </p>
-          )}
-          
-          {status === "success" && (
-            <p style={{ color: "#00c853", fontSize: "14px", marginBottom: "15px" }}>
-              ✓ Message sent successfully! Thank you for reaching out.
-            </p>
-          )}
-          
-          <button 
-            className="form-btn" 
-            type="submit"
-            disabled={status === "sending"}
-            style={{ opacity: status === "sending" ? 0.7 : 1 }}
-          >
-            {status === "sending" ? "Sending..." : "Send Message"}
-          </button>
-        </form>
-      </div>
-    </section>
-  );
 }
 
 // Main Page Component
@@ -473,16 +355,6 @@ export default function Home() {
                       ),
                     }}
                   />
-                  {item.tags && item.tags.length > 0 && (
-                    <div className="experience-tags">
-                      <span className="experience-tags-label">Tags:</span>
-                      <div className="experience-tags-list">
-                        {item.tags.map((tag, tagIndex) => (
-                          <span key={tagIndex} className="experience-tag">{tag}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </li>
               ))}
             </ol>
@@ -584,18 +456,30 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            {data.personalInfo.qrCodeUrl && (
-              <div className="qr-box">
-                <img
-                  className="qr-image"
-                  src={data.personalInfo.qrCodeUrl}
-                  alt="QR Code"
-                />
-              </div>
-            )}
+            <div className="qr-box">
+              <img
+                className="qr-image"
+                src={`data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><rect width='100%' height='100%' fill='%23252525'/><text x='50%' y='50%' text-anchor='middle' font-size='14' fill='%23ffffff' font-family='Poppins,Arial'>${encodeText("QR")}</text></svg>`}
+                alt="QR placeholder"
+              />
+            </div>
           </section>
 
-          <ContactForm recipientEmail={data.personalInfo.email} />
+          <section className="contact-form-box">
+            <div className="contact-form-wrapper">
+              <h3 className="h3 form-title">Contact Form</h3>
+              <form className="contact-form">
+                <div className="input-wrapper">
+                  <input className="form-input" type="text" placeholder="Full Name" />
+                  <input className="form-input" type="email" placeholder="Email Address" />
+                </div>
+                <textarea className="form-input" placeholder="Your Message"></textarea>
+                <button className="form-btn" type="submit">
+                  Send Message
+                </button>
+              </form>
+            </div>
+          </section>
         </article>
 
         <article className={`gallery ${activeTab === "gallery" ? "active" : ""}`}>
