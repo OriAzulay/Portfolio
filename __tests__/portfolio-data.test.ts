@@ -1,14 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  defaultPortfolioData,
-  type PortfolioData,
-  type PersonalInfo,
-  type Skill,
-  type Experience,
-  type Education,
-  type Project,
-  type GalleryItem,
-} from '../app/lib/portfolio-data'
+import { defaultPortfolioData } from '../app/lib/portfolio-data'
 
 describe('Portfolio Data Types', () => {
   describe('defaultPortfolioData', () => {

@@ -79,11 +79,16 @@ const tabItems = [
 ];
 
 function usePortfolioData() {
-  const [data, setData] = useState<PortfolioData>(defaultPortfolioData);
+  const [data] = useState<PortfolioData>(() => {
+    if (typeof window !== "undefined") {
+      return getPortfolioData();
+    }
+    return defaultPortfolioData;
+  });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setData(getPortfolioData());
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Hydration pattern
     setMounted(true);
   }, []);
 

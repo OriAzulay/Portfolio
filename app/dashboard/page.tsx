@@ -113,14 +113,19 @@ export default function DashboardPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("about");
-  const [data, setData] = useState<PortfolioData>(defaultPortfolioData);
+  const [data, setData] = useState<PortfolioData>(() => {
+    if (typeof window !== "undefined") {
+      return getPortfolioData();
+    }
+    return defaultPortfolioData;
+  });
 
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push("/login");
       return;
     }
-    setData(getPortfolioData());
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Auth check pattern
     setLoading(false);
   }, [router]);
 
