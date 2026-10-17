@@ -161,48 +161,60 @@ high-quality, scalable solutions that make a real impact.`,
   ],
 };
 
-const STORAGE_KEY = "portfolio_data";
+function mergePortfolioData(parsed?: Partial<PortfolioData>): PortfolioData {
+  if (!parsed) return defaultPortfolioData;
 
-export function getPortfolioData(): PortfolioData {
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as Partial<PortfolioData>;
-        return {
-          ...defaultPortfolioData,
-          ...parsed,
-          personalInfo: {
-            ...defaultPortfolioData.personalInfo,
-            ...parsed.personalInfo,
-            social: {
-              ...defaultPortfolioData.personalInfo.social,
-              ...parsed.personalInfo?.social,
-            },
-            stats: {
-              ...defaultPortfolioData.personalInfo.stats,
-              ...parsed.personalInfo?.stats,
-            },
-          },
-          skills: parsed.skills ?? defaultPortfolioData.skills,
-          experience: parsed.experience ?? defaultPortfolioData.experience,
-          education: parsed.education ?? defaultPortfolioData.education,
-          projects: (parsed.projects ?? defaultPortfolioData.projects).map((proj) => ({
-            ...proj,
-            imageUrl: (proj as Project).imageUrl ?? "",
-          })),
-          gallery: parsed.gallery ?? defaultPortfolioData.gallery,
-        };
-      } catch {
-        return defaultPortfolioData;
-      }
-    }
-  }
-  return defaultPortfolioData;
+  return {
+    ...defaultPortfolioData,
+    ...parsed,
+    personalInfo: {
+      ...defaultPortfolioData.personalInfo,
+      ...parsed.personalInfo,
+      social: {
+        ...defaultPortfolioData.personalInfo.social,
+        ...parsed.personalInfo?.social,
+      },
+      stats: {
+        ...defaultPortfolioData.personalInfo.stats,
+        ...parsed.personalInfo?.stats,
+      },
+    },
+    skills: parsed.skills ?? defaultPortfolioData.skills,
+    experience: parsed.experience ?? defaultPortfolioData.experience,
+    education: parsed.education ?? defaultPortfolioData.education,
+    projects: (parsed.projects ?? defaultPortfolioData.projects).map((proj) => ({
+      ...proj,
+      imageUrl: (proj as Project).imageUrl ?? "",
+    })),
+    gallery: parsed.gallery ?? defaultPortfolioData.gallery,
+  };
 }
 
-export function savePortfolioData(data: PortfolioData): void {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+export async function fetchPortfolioData(): Promise<PortfolioData> {
+  try {
+    const response = await fetch("/api/portfolio", { cache: "no-store" });
+    if (!response.ok) return defaultPortfolioData;
+    const json = await response.json();
+    return mergePortfolioData(json.data as Partial<PortfolioData>);
+  } catch {
+    return defaultPortfolioData;
+  }
+}
+
+export async function savePortfolioData(
+  data: PortfolioData,
+  adminPassword: string
+): Promise<void> {
+  const response = await fetch("/api/portfolio", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-password": adminPassword,
+    },
+    body: JSON.stringify({ data }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Save failed");
   }
 }

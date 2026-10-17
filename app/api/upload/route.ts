@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { getSupabaseServerClient } from "@/app/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,15 +30,21 @@ export async function POST(request: NextRequest) {
 
     const safeKind = kindRaw.replace(/[^a-z0-9-_]/gi, "").toLowerCase() || "generic";
     const ext = path.extname(file.name) || ".png";
-    const filename = `${Date.now()}-${crypto.randomUUID()}${ext}`;
+    const filename = `${safeKind}/${Date.now()}-${crypto.randomUUID()}${ext}`;
+    const bucket = process.env.SUPABASE_BUCKET || "portfolio-assets";
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", safeKind);
-    await mkdir(uploadDir, { recursive: true });
-
+    const supabase = getSupabaseServerClient();
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadDir, filename), buffer);
+    const { error } = await supabase.storage
+      .from(bucket)
+      .upload(filename, buffer, { contentType: file.type, upsert: false });
 
-    return NextResponse.json({ url: `/uploads/${safeKind}/${filename}` });
+    if (error) {
+      return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    }
+
+    const { data } = supabase.storage.from(bucket).getPublicUrl(filename);
+    return NextResponse.json({ url: data.publicUrl });
   } catch (error) {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }

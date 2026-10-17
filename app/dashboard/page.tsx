@@ -6,7 +6,7 @@ import { isAuthenticated, removeAuthToken } from "../lib/auth";
 import {
   PortfolioData,
   defaultPortfolioData,
-  getPortfolioData,
+  fetchPortfolioData,
   savePortfolioData,
   Skill,
   Experience,
@@ -114,35 +114,79 @@ export default function DashboardPage() {
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("about");
   const [data, setData] = useState<PortfolioData>(defaultPortfolioData);
+  const [visitorCount, setVisitorCount] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push("/login");
       return;
     }
-    setData(getPortfolioData());
-    setLoading(false);
+    let isMounted = true;
+    fetchPortfolioData()
+      .then((nextData) => {
+        if (isMounted) {
+          setData(nextData);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+    fetch("/api/visits")
+      .then((res) => res.json())
+      .then((json) => {
+        if (isMounted) {
+          setVisitorCount(Number(json.count) || 0);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
-  const handleSave = () => {
+  const getAdminPassword = () =>
+    typeof window !== "undefined" ? sessionStorage.getItem("admin_password") : null;
+
+  const handleSave = async () => {
+    const adminPassword = getAdminPassword();
+    if (!adminPassword) {
+      alert("Missing admin password. Please log in again.");
+      return;
+    }
     setSaving(true);
-    savePortfolioData(data);
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      await savePortfolioData(data, adminPassword);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    }, 500);
+    } catch {
+      alert("Save failed.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleLogout = () => {
     removeAuthToken();
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("admin_password");
+    }
     router.push("/login");
   };
 
-  const handleReset = () => {
-    if (confirm("Reset all data to defaults?")) {
+  const handleReset = async () => {
+    if (!confirm("Reset all data to defaults?")) return;
+    const adminPassword = getAdminPassword();
+    if (!adminPassword) {
+      alert("Missing admin password. Please log in again.");
+      return;
+    }
+    try {
       setData(defaultPortfolioData);
-      savePortfolioData(defaultPortfolioData);
+      await savePortfolioData(defaultPortfolioData, adminPassword);
+    } catch {
+      alert("Reset failed.");
     }
   };
 
@@ -396,6 +440,9 @@ export default function DashboardPage() {
       <article className="active">
         <div className="admin-topbar">
           <div className="admin-title">Admin Dashboard</div>
+          <div style={{ fontSize: "12px", opacity: 0.7 }}>
+            Visitors: {visitorCount ?? "—"}
+          </div>
           <div className="admin-actions">
             <button
               className="admin-btn primary"

@@ -5,7 +5,7 @@ import DOMPurify from "dompurify";
 import {
   PortfolioData,
   defaultPortfolioData,
-  getPortfolioData,
+  fetchPortfolioData,
 } from "./lib/portfolio-data";
 
 const Icons = {
@@ -83,8 +83,17 @@ function usePortfolioData() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setData(getPortfolioData());
-    setMounted(true);
+    let isMounted = true;
+    fetchPortfolioData().then((nextData) => {
+      if (isMounted) {
+        setData(nextData);
+        setMounted(true);
+      }
+    });
+    fetch("/api/visits", { method: "POST" }).catch(() => {});
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return { data, mounted };
