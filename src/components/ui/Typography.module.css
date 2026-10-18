@@ -1,0 +1,61 @@
+.h2,
+.h3,
+.h4,
+.h5 {
+  color: var(--white-2);
+  text-transform: capitalize;
+}
+
+.h2 {
+  font-size: var(--fs-1);
+}
+
+.h3 {
+  font-size: var(--fs-2);
+}
+
+.h4 {
+  font-size: var(--fs-1);
+}
+
+.h5 {
+  font-size: var(--fs-7);
+  font-weight: var(--fw-500);
+}
+
+.articleTitle {
+  position: relative;
+  padding-bottom: 7px;
+  margin-bottom: 30px;
+}
+
+.articleTitle::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--text-gradient-blue);
+  border-radius: 3px;
+}
+
+.compact {
+  margin-bottom: 15px;
+}
+
+@media (min-width: 576px) {
+  .articleTitle {
+    font-weight: var(--fw-600);
+    padding-bottom: 15px;
+  }
+
+  .articleTitle::after {
+    width: 70px;
+    height: 5px;
+  }
+
+  .compact {
+    margin-bottom: 20px;
+  }
+}

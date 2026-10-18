@@ -1,0 +1,30 @@
+.main {
+  margin: 15px 12px;
+  margin-bottom: 75px;
+  min-width: 259px;
+  min-height: calc(100vh - 140px);
+}
+
+@media (min-width: 576px) {
+  .main {
+    margin-top: 50px;
+    margin-bottom: 100px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main {
+    margin-bottom: 50px;
+  }
+}
+
+@media (min-width: 1250px) {
+  .main {
+    max-width: 1200px;
+    margin-inline: auto;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 25px;
+  }
+}

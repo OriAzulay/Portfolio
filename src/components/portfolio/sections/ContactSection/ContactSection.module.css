@@ -1,0 +1,53 @@
+.details {
+  background: var(--eerie-black-2);
+  border-radius: 20px;
+  padding: 20px;
+  margin-block: 20px;
+  border: 1px solid var(--jet);
+  box-shadow: var(--shadow-1);
+}
+
+.detailsList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.detailsItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+}
+
+.detailsText {
+  font-size: var(--fs-6);
+  color: var(--light-gray);
+  font-style: normal;
+  overflow-wrap: anywhere;
+}
+
+a.detailsText:hover,
+a.detailsText:focus-visible {
+  color: var(--sky-blue-crayola);
+}
+
+/* Honeypot: off-screen for humans, still "fillable" for naive bots. */
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.sendIcon {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .detailsList {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}

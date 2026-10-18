@@ -1,0 +1,80 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.unread {
+  outline: 1px solid hsla(190, 82%, 72%, 0.35);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--white-2);
+  font-size: var(--fs-5);
+  font-weight: var(--fw-500);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sky-blue-crayola);
+}
+
+.email {
+  color: var(--sky-blue-crayola);
+  font-size: var(--fs-7);
+  overflow-wrap: anywhere;
+}
+
+.date {
+  color: var(--light-gray-70);
+  font-size: var(--fs-8);
+}
+
+.body {
+  color: var(--light-gray);
+  font-size: var(--fs-6);
+  font-weight: var(--fw-300);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-bottom: 15px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.action {
+  color: var(--light-gray);
+  background: var(--onyx);
+  font-size: var(--fs-8);
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.action:hover:not(:disabled) {
+  color: var(--sky-blue-crayola);
+}
+
+.action:disabled {
+  opacity: 0.5;
+}
+
+.danger:hover:not(:disabled) {
+  color: var(--bittersweet-shimmer);
+}

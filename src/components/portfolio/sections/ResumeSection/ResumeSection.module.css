@@ -1,0 +1,142 @@
+.timeline {
+  margin-bottom: 30px;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.timelineList {
+  font-size: var(--fs-6);
+  margin-left: 45px;
+}
+
+.timelineItem {
+  position: relative;
+}
+
+.timelineItem:not(:last-child) {
+  margin-bottom: 20px;
+}
+
+.timelineItem:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: -25px;
+  left: -30px;
+  width: 1px;
+  height: calc(100% + 50px);
+  background: var(--jet);
+}
+
+.timelineItem::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: -33px;
+  height: 6px;
+  width: 6px;
+  background: var(--text-gradient-blue);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--jet);
+}
+
+.itemTitle {
+  font-size: var(--fs-5);
+  line-height: 1.3;
+  margin-bottom: 7px;
+}
+
+.period {
+  color: var(--vegas-gold);
+  font-weight: var(--fw-400);
+  line-height: 1.6;
+}
+
+.company {
+  color: var(--light-gray-70);
+  font-weight: var(--fw-400);
+  margin-bottom: 4px;
+}
+
+.text {
+  color: var(--light-gray);
+  font-weight: var(--fw-300);
+  line-height: 1.6;
+}
+
+.text ul,
+.text ol {
+  padding-left: 20px;
+}
+
+.text li {
+  list-style: disc;
+}
+
+.text ol li {
+  list-style: decimal;
+}
+
+.skillsTitle {
+  margin-bottom: 20px;
+}
+
+.skillItem:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.skillHeader {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.skillValue {
+  color: var(--light-gray);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-300);
+}
+
+.progressBg {
+  background: var(--jet);
+  width: 100%;
+  height: 8px;
+  border-radius: 10px;
+}
+
+.progressFill {
+  background: var(--text-gradient-blue);
+  height: 100%;
+  border-radius: inherit;
+}
+
+@media (min-width: 576px) {
+  .timelineList {
+    margin-left: 65px;
+  }
+
+  .timelineItem:not(:last-child)::before {
+    left: -40px;
+  }
+
+  .timelineItem::after {
+    height: 8px;
+    width: 8px;
+    left: -43px;
+  }
+
+  .skillItem:not(:last-child) {
+    margin-bottom: 25px;
+  }
+}
+
+@media (min-width: 1250px) {
+  .text {
+    max-width: 700px;
+  }
+}

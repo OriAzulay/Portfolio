@@ -1,0 +1,129 @@
+.label {
+  color: var(--light-gray-70);
+  font-size: var(--fs-8);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-left: 4px;
+  margin-bottom: 6px;
+}
+
+/* Image field */
+
+.imageField {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 25px;
+}
+
+.preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--jet);
+  background: var(--bg-gradient-onyx);
+}
+
+.imageControls {
+  flex: 1 1 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.uploadBtn {
+  width: max-content;
+  color: var(--sky-blue-crayola);
+  background: var(--onyx);
+  border: 1px solid var(--jet);
+  font-size: var(--fs-7);
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition-1);
+}
+
+.uploadBtn:hover,
+.uploadBtn:focus-within {
+  border-color: var(--sky-blue-crayola);
+}
+
+.linkBtn {
+  width: max-content;
+  color: var(--light-gray-70);
+  font-size: var(--fs-8);
+  text-decoration: underline;
+}
+
+.linkBtn:hover {
+  color: var(--bittersweet-shimmer);
+}
+
+.error {
+  color: var(--bittersweet-shimmer);
+  font-size: var(--fs-8);
+}
+
+/* Rich text editor */
+
+.richText {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.toolBtn {
+  width: auto;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: var(--onyx);
+  border: 1px solid var(--jet);
+  color: var(--white-2);
+  font-size: var(--fs-7);
+}
+
+.toolBtn:hover {
+  border-color: var(--sky-blue-crayola);
+}
+
+.colorInput {
+  width: 40px;
+  height: 34px;
+  padding: 2px;
+  border: 1px solid var(--jet);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.surface {
+  min-height: 120px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--jet);
+  background: var(--eerie-black-2);
+  color: var(--white-2);
+  font-size: var(--fs-6);
+  line-height: 1.6;
+  outline: none;
+}
+
+.surface:focus {
+  border-color: var(--sky-blue-crayola);
+}
+
+.surface ul {
+  padding-left: 20px;
+}
+
+.surface li {
+  list-style: disc;
+}
