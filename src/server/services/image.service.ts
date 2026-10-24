@@ -28,10 +28,14 @@ export function parseImageKind(value: unknown): ImageKind {
 }
 
 /** Stores raw image bytes and returns the public URL. */
-export function storeImageBytes(bytes: Buffer, kind: ImageKind): { id: string; url: string } {
+export function storeImageBytes(
+  bytes: Buffer,
+  kind: ImageKind,
+  maxBytes: number = config.maxImageBytes
+): { id: string; url: string } {
   if (bytes.length === 0) throw new AppError(400, "Empty file");
-  if (bytes.length > config.maxImageBytes) {
-    throw new AppError(413, `Image is too large (max ${config.maxImageBytes / 1024 / 1024} MB)`);
+  if (bytes.length > maxBytes) {
+    throw new AppError(413, `Image is too large (max ${maxBytes / 1024 / 1024} MB)`);
   }
   const mimeType = detectImageType(bytes);
   if (!mimeType) throw new AppError(415, "Unsupported image type. Use PNG, JPEG, WebP, GIF or AVIF.");

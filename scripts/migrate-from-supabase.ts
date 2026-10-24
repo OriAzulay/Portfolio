@@ -37,7 +37,8 @@ const URL_VARS = ["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL"];
 const KEY_VARS = ["SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_KEY", "SUPABASE_KEY"];
 const urlEnv = readEnv(...URL_VARS);
 const keyEnv = readEnv(...KEY_VARS);
-const SUPABASE_URL = urlEnv?.value.replace(/\/+$/, "");
+// Accept both the project URL and the "Data API" URL (…/rest/v1/).
+const SUPABASE_URL = urlEnv?.value.replace(/\/+$/, "").replace(/\/rest\/v1$/i, "");
 const SUPABASE_KEY = keyEnv?.value;
 const force = process.argv.includes("--force");
 
@@ -78,6 +79,8 @@ function assertSupabaseConfig(): void {
 
 type Json = Record<string, unknown>;
 
+class TableMissingError extends Error {}
+
 async function supabaseSelect<T>(table: string, query: string): Promise<T[]> {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, {
     // Legacy service_role keys are JWTs and also go in Authorization;
@@ -86,6 +89,9 @@ async function supabaseSelect<T>(table: string, query: string): Promise<T[]> {
       ? { apikey: SUPABASE_KEY!, Authorization: `Bearer ${SUPABASE_KEY}` }
       : { apikey: SUPABASE_KEY! },
   });
+  if (response.status === 404) {
+    throw new TableMissingError(`Table "${table}" does not exist`);
+  }
   if (!response.ok) {
     throw new Error(`Supabase ${table}: HTTP ${response.status} ${await response.text()}`);
   }
@@ -116,13 +122,30 @@ async function rehostImage(url: unknown, kind: ImageKind): Promise<unknown> {
       console.warn(`  ! could not load ${url} - leaving it empty`);
       return "";
     }
-    const { url: newUrl } = storeImageBytes(bytes, kind);
-    console.log(`  ✓ ${kind} image -> ${newUrl}`);
+    // Existing photos may exceed the 5 MB dashboard upload limit - keep them.
+    const { url: newUrl } = storeImageBytes(bytes, kind, 50 * 1024 * 1024);
+    const size = bytes.length > 1024 * 1024 ? ` (${(bytes.length / 1024 / 1024).toFixed(1)} MB)` : "";
+    console.log(`  ✓ ${kind} image -> ${newUrl}${size}`);
     return newUrl;
   } catch (error) {
     console.warn(`  ! skipped ${url}: ${(error as Error).message}`);
     return "";
   }
+}
+
+/** The old app used table `portfolio_data`; some setups named it `portfolio`. Prefers row id 1. */
+async function fetchPortfolioJson(): Promise<Json | null> {
+  for (const table of ["portfolio_data", "portfolio"]) {
+    try {
+      const rows = await supabaseSelect<{ id: number; data: Json | null }>(table, "select=id,data&order=id.asc");
+      const row = rows.find((r) => r.id === 1) ?? rows[0];
+      console.log(`  found table "${table}" (${rows.length} row(s))`);
+      return row?.data ?? null;
+    } catch (error) {
+      if (!(error instanceof TableMissingError)) throw error;
+    }
+  }
+  throw new Error('No "portfolio_data" or "portfolio" table found in Supabase.');
 }
 
 async function main() {
@@ -133,8 +156,7 @@ async function main() {
   }
 
   console.log("Fetching portfolio from Supabase...");
-  const rows = await supabaseSelect<{ data: Json | null }>("portfolio_data", "id=eq.1&select=data");
-  const data = rows[0]?.data;
+  const data = await fetchPortfolioJson();
   if (!data || Object.keys(data).length === 0) {
     console.log("No portfolio content in Supabase - nothing to import.");
   } else {
@@ -165,7 +187,13 @@ async function main() {
   const visits = await supabaseSelect<{ ip_hash: string; created_at: string | null }>(
     "visits",
     "select=ip_hash,created_at"
-  );
+  ).catch((error) => {
+    if (error instanceof TableMissingError) {
+      console.log("  (no visits table in Supabase - skipping)");
+      return [];
+    }
+    throw error;
+  });
   for (const visit of visits) {
     const firstSeen = visit.created_at ? new Date(visit.created_at).toISOString().replace("T", " ").slice(0, 19) : undefined;
     visitsRepository.record(visit.ip_hash, firstSeen);
@@ -175,6 +203,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Migration failed:", error);
-  process.exit(1);
+  console.error("Migration failed:", error instanceof Error ? error.message : error);
+  process.exitCode = 1;
 });
