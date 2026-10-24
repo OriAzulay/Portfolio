@@ -24,9 +24,55 @@ try {
   // Fall back to variables already in the environment.
 }
 
-const SUPABASE_URL = process.env.SUPABASE_URL?.replace(/\/$/, "");
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+/** First non-empty value among the given env var names (supports common aliases). */
+function readEnv(...names: string[]): { name: string; value: string } | null {
+  for (const name of names) {
+    const value = process.env[name]?.trim().replace(/^["']|["']$/g, "");
+    if (value) return { name, value };
+  }
+  return null;
+}
+
+const URL_VARS = ["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL"];
+const KEY_VARS = ["SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_KEY", "SUPABASE_KEY"];
+const urlEnv = readEnv(...URL_VARS);
+const keyEnv = readEnv(...KEY_VARS);
+const SUPABASE_URL = urlEnv?.value.replace(/\/+$/, "");
+const SUPABASE_KEY = keyEnv?.value;
 const force = process.argv.includes("--force");
+
+/** Exits with a clear message unless both Supabase settings look real. */
+function assertSupabaseConfig(): void {
+  const problems: string[] = [];
+  const where = "Supabase dashboard > Project Settings > API";
+
+  if (!urlEnv) {
+    problems.push(`${URL_VARS[0]} is missing. Copy the "Project URL" from ${where}.`);
+  } else if (!/^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(SUPABASE_URL ?? "")) {
+    let valid = false;
+    try {
+      valid = new URL(SUPABASE_URL ?? "").protocol === "https:";
+    } catch {}
+    if (!valid) {
+      problems.push(
+        `${urlEnv.name} is not a valid URL (expected https://<project-ref>.supabase.co). Copy the "Project URL" from ${where}.`
+      );
+    }
+  }
+
+  if (!keyEnv) {
+    problems.push(`${KEY_VARS[0]} is missing. Copy the "service_role" secret from ${where}.`);
+  } else if ((SUPABASE_KEY ?? "").length < 30) {
+    problems.push(`${keyEnv.name} looks like a placeholder. Copy the "service_role" secret from ${where}.`);
+  }
+
+  if (problems.length > 0) {
+    console.error("Can't reach Supabase - fix .env.local first:\n");
+    for (const problem of problems) console.error(`  - ${problem}`);
+    console.error("\nIf you never stored content in Supabase, you don't need this script: edit the site in /dashboard instead.");
+    process.exit(1);
+  }
+}
 
 type Json = Record<string, unknown>;
 
@@ -74,10 +120,7 @@ async function rehostImage(url: unknown, kind: ImageKind): Promise<unknown> {
 }
 
 async function main() {
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-    console.error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set (in .env.local).");
-    process.exit(1);
-  }
+  assertSupabaseConfig();
   if (hasStoredPortfolio() && !force) {
     console.error("SQLite already contains portfolio data. Re-run with --force to overwrite it.");
     process.exit(1);
