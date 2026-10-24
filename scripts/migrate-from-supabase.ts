@@ -123,7 +123,7 @@ async function rehostImage(url: unknown, kind: ImageKind): Promise<unknown> {
       return "";
     }
     // Existing photos may exceed the 5 MB dashboard upload limit - keep them.
-    const { url: newUrl } = storeImageBytes(bytes, kind, 50 * 1024 * 1024);
+    const { url: newUrl } = await storeImageBytes(bytes, kind, 50 * 1024 * 1024);
     const size = bytes.length > 1024 * 1024 ? ` (${(bytes.length / 1024 / 1024).toFixed(1)} MB)` : "";
     console.log(`  ✓ ${kind} image -> ${newUrl}${size}`);
     return newUrl;

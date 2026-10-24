@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import { config } from "../config";
 import { AppError } from "../http/errors";
 import { imagesRepository, type StoredImage } from "../repositories/images.repository";
+import { optimizeImage } from "./image-processing";
 import type { ImageKind, PortfolioData } from "@/types/portfolio";
 
 const IMAGE_KINDS: readonly ImageKind[] = ["avatar", "project", "gallery"];
@@ -27,12 +28,12 @@ export function parseImageKind(value: unknown): ImageKind {
   return IMAGE_KINDS.includes(value as ImageKind) ? (value as ImageKind) : "gallery";
 }
 
-/** Stores raw image bytes and returns the public URL. */
-export function storeImageBytes(
+/** Validates, resizes/compresses and stores image bytes. Returns the public URL. */
+export async function storeImageBytes(
   bytes: Buffer,
   kind: ImageKind,
   maxBytes: number = config.maxImageBytes
-): { id: string; url: string } {
+): Promise<{ id: string; url: string; size: number }> {
   if (bytes.length === 0) throw new AppError(400, "Empty file");
   if (bytes.length > maxBytes) {
     throw new AppError(413, `Image is too large (max ${maxBytes / 1024 / 1024} MB)`);
@@ -40,9 +41,10 @@ export function storeImageBytes(
   const mimeType = detectImageType(bytes);
   if (!mimeType) throw new AppError(415, "Unsupported image type. Use PNG, JPEG, WebP, GIF or AVIF.");
 
+  const optimized = await optimizeImage(bytes, mimeType, kind);
   const id = crypto.randomUUID();
-  imagesRepository.insert({ id, kind, mimeType, data: bytes });
-  return { id, url: imageUrl(id) };
+  imagesRepository.insert({ id, kind, mimeType: optimized.mimeType, data: optimized.data });
+  return { id, url: imageUrl(id), size: optimized.data.length };
 }
 
 export async function storeUploadedImage(file: unknown, kind: unknown) {
@@ -57,6 +59,21 @@ export function getImage(id: string): StoredImage {
   const image = UUID_PATTERN.test(id) ? imagesRepository.findById(id) : null;
   if (!image) throw new AppError(404, "Image not found");
   return image;
+}
+
+/** Re-compresses already stored images in place (same id, so existing links keep working). */
+export async function optimizeStoredImages(): Promise<{ id: string; before: number; after: number }[]> {
+  const changed: { id: string; before: number; after: number }[] = [];
+  for (const meta of imagesRepository.listMeta()) {
+    const image = imagesRepository.findById(meta.id);
+    if (!image) continue;
+    const optimized = await optimizeImage(image.data, image.mimeType, parseImageKind(meta.kind));
+    if (optimized.data.length < image.size) {
+      imagesRepository.updateData(meta.id, optimized.mimeType, optimized.data);
+      changed.push({ id: meta.id, before: image.size, after: optimized.data.length });
+    }
+  }
+  return changed;
 }
 
 /** Removes stored images no longer referenced by the portfolio (keeps uploads from the last hour). */

@@ -33,5 +33,6 @@ export const config = {
     return DEV_SESSION_SECRET;
   },
 
-  maxImageBytes: 5 * 1024 * 1024,
+  /** Max upload size before compression (uploads are resized + re-encoded). */
+  maxImageBytes: 15 * 1024 * 1024,
 };

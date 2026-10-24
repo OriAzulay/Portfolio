@@ -22,6 +22,21 @@ export const imagesRepository = {
     return row ?? null;
   },
 
+  listMeta(): { id: string; kind: string; size: number }[] {
+    return getDb().prepare("SELECT id, kind, size FROM images ORDER BY created_at").all() as {
+      id: string;
+      kind: string;
+      size: number;
+    }[];
+  },
+
+  /** Replaces the bytes behind an id (used when re-compressing). */
+  updateData(id: string, mimeType: string, data: Buffer): void {
+    getDb()
+      .prepare("UPDATE images SET mime_type = ?, size = ?, data = ? WHERE id = ?")
+      .run(mimeType, data.length, data, id);
+  },
+
   /**
    * Deletes images that are not in `keepIds` and are older than `minAgeMinutes`
    * (fresh uploads may not be saved into the portfolio yet).
