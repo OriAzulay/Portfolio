@@ -1,4 +1,5 @@
 import type { PortfolioData } from "@/types/portfolio";
+import { ThemeToggle } from "@/components/ui/ThemeToggle/ThemeToggle";
 import { PortfolioTabs, type PortfolioTab } from "./PortfolioTabs/PortfolioTabs";
 import { Sidebar } from "./Sidebar/Sidebar";
 import { VisitTracker } from "./VisitTracker";
@@ -21,10 +22,13 @@ export function PortfolioPage({ data }: { data: PortfolioData }) {
   }
 
   return (
-    <main className={styles.main}>
-      <Sidebar info={data.personalInfo} />
-      <PortfolioTabs tabs={tabs} />
-      <VisitTracker />
-    </main>
+    <>
+      <ThemeToggle className={styles.themeToggle} />
+      <main className={styles.main}>
+        <Sidebar info={data.personalInfo} />
+        <PortfolioTabs tabs={tabs} />
+        <VisitTracker />
+      </main>
+    </>
   );
 }

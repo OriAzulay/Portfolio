@@ -19,3 +19,9 @@
     width: 480px;
   }
 }
+
+.themeToggle {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}

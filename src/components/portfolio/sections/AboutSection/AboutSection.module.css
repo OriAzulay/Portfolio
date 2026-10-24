@@ -1,5 +1,5 @@
 .aboutText {
-  color: var(--light-gray);
+  color: var(--color-text-muted);
   font-size: var(--fs-6);
   font-weight: var(--fw-300);
   line-height: 1.6;
@@ -32,12 +32,12 @@
 }
 
 .highlightsList::-webkit-scrollbar-track {
-  background: var(--onyx);
+  background: var(--color-chip);
   border-radius: 5px;
 }
 
 .highlightsList::-webkit-scrollbar-thumb {
-  background: var(--sky-blue-crayola);
+  background: var(--color-accent);
   border-radius: 5px;
 }
 
@@ -51,7 +51,7 @@
 }
 
 .highlightLabel {
-  color: var(--light-gray);
+  color: var(--color-text-muted);
   font-size: var(--fs-6);
   font-weight: var(--fw-300);
   line-height: 1.6;

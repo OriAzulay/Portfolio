@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Courgette, Poppins } from "next/font/google";
+import { themeInitScript } from "@/components/ui/ThemeToggle/ThemeToggle";
 import "@/styles/globals.css";
 
 const poppins = Poppins({
@@ -22,12 +23,19 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#121212",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#121212" },
+    { media: "(prefers-color-scheme: light)", color: "#eef1f5" },
+  ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${poppins.variable} ${courgette.variable}`}>
+    // data-theme is set by the inline script before hydration, hence suppressHydrationWarning.
+    <html lang="en" className={`${poppins.variable} ${courgette.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );

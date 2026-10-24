@@ -46,12 +46,12 @@ select {
 }
 
 ::selection {
-  background: var(--sky-blue-crayola);
-  color: var(--smoky-black);
+  background: var(--color-accent);
+  color: var(--color-bg);
 }
 
 :focus {
-  outline-color: var(--sky-blue-crayola);
+  outline-color: var(--color-accent);
 }
 
 html {
@@ -59,7 +59,7 @@ html {
 }
 
 body {
-  background: var(--smoky-black);
+  background: var(--color-bg);
 }
 
 html,

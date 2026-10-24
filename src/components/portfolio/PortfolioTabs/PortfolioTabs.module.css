@@ -7,9 +7,9 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  background: hsla(240, 1%, 17%, 0.75);
+  background: var(--color-nav-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--jet);
+  border: 1px solid var(--color-border);
   border-radius: 12px 12px 0 0;
   box-shadow: var(--shadow-2);
   z-index: 5;
@@ -25,7 +25,7 @@
 }
 
 .navLink {
-  color: var(--light-gray);
+  color: var(--color-text-muted);
   font-size: var(--fs-7);
   padding: 15px 3px;
   transition: color var(--transition-1);
@@ -33,11 +33,11 @@
 
 .navLink:hover,
 .navLink:focus-visible {
-  color: var(--light-gray-70);
+  color: var(--color-text-subtle);
 }
 
 .navLink.active {
-  color: var(--sky-blue-crayola);
+  color: var(--color-accent);
 }
 
 @media (min-width: 576px) {

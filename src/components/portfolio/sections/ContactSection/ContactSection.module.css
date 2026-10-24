@@ -1,9 +1,9 @@
 .details {
-  background: var(--eerie-black-2);
+  background: var(--color-surface);
   border-radius: 20px;
   padding: 20px;
   margin-block: 20px;
-  border: 1px solid var(--jet);
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-1);
 }
 
@@ -23,14 +23,14 @@
 
 .detailsText {
   font-size: var(--fs-6);
-  color: var(--light-gray);
+  color: var(--color-text-muted);
   font-style: normal;
   overflow-wrap: anywhere;
 }
 
 a.detailsText:hover,
 a.detailsText:focus-visible {
-  color: var(--sky-blue-crayola);
+  color: var(--color-accent);
 }
 
 /* Honeypot: off-screen for humans, still "fillable" for naive bots. */

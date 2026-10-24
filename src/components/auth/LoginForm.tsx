@@ -6,6 +6,7 @@ import { api, ApiError } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { ArticleTitle } from "@/components/ui/ArticleTitle";
 import { Panel } from "@/components/ui/Panel";
+import { ThemeToggle } from "@/components/ui/ThemeToggle/ThemeToggle";
 import form from "@/components/ui/Form.module.css";
 import styles from "./LoginForm.module.css";
 
@@ -31,6 +32,7 @@ export function LoginForm() {
 
   return (
     <main className={styles.main}>
+      <ThemeToggle className={styles.themeToggle} />
       <Panel className={styles.panel}>
         <ArticleTitle>Admin Login</ArticleTitle>
         <p className={form.hint}>Enter your password to edit the portfolio.</p>

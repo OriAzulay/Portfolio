@@ -9,7 +9,7 @@
   align-items: center;
   flex-shrink: 0;
   font-size: 16px;
-  color: var(--sky-blue-crayola);
+  color: var(--color-accent);
   box-shadow: var(--shadow-1);
   z-index: 1;
 }
@@ -18,7 +18,7 @@
   content: "";
   position: absolute;
   inset: 1px;
-  background: var(--eerie-black-1);
+  background: var(--color-surface-2);
   border-radius: inherit;
   z-index: -1;
 }

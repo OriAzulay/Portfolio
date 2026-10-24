@@ -5,7 +5,7 @@
 }
 
 .unread {
-  outline: 1px solid hsla(190, 82%, 72%, 0.35);
+  outline: 1px solid var(--color-accent-soft);
 }
 
 .header {
@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--white-2);
+  color: var(--color-text);
   font-size: var(--fs-5);
   font-weight: var(--fw-500);
 }
@@ -29,22 +29,22 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--sky-blue-crayola);
+  background: var(--color-accent);
 }
 
 .email {
-  color: var(--sky-blue-crayola);
+  color: var(--color-accent);
   font-size: var(--fs-7);
   overflow-wrap: anywhere;
 }
 
 .date {
-  color: var(--light-gray-70);
+  color: var(--color-text-subtle);
   font-size: var(--fs-8);
 }
 
 .body {
-  color: var(--light-gray);
+  color: var(--color-text-muted);
   font-size: var(--fs-6);
   font-weight: var(--fw-300);
   line-height: 1.6;
@@ -60,15 +60,15 @@
 }
 
 .action {
-  color: var(--light-gray);
-  background: var(--onyx);
+  color: var(--color-text-muted);
+  background: var(--color-chip);
   font-size: var(--fs-8);
   padding: 6px 12px;
   border-radius: 8px;
 }
 
 .action:hover:not(:disabled) {
-  color: var(--sky-blue-crayola);
+  color: var(--color-accent);
 }
 
 .action:disabled {
@@ -76,5 +76,5 @@
 }
 
 .danger:hover:not(:disabled) {
-  color: var(--bittersweet-shimmer);
+  color: var(--color-danger);
 }

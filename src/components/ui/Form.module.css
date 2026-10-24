@@ -1,7 +1,7 @@
 /* Shared form styles: public contact form, login and dashboard editors. */
 
 .box {
-  background: var(--eerie-black-2);
+  background: var(--color-surface);
   border-radius: 20px;
   padding: 10px;
   margin-block: 20px;
@@ -15,7 +15,7 @@
   font-size: 0.75rem;
   opacity: 0.5;
   padding: 0 7px;
-  color: var(--white-2);
+  color: var(--color-text);
   margin-bottom: 10px;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .label {
-  color: var(--light-gray-70);
+  color: var(--color-text-subtle);
   font-size: var(--fs-8);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -41,11 +41,11 @@
 }
 
 .input {
-  color: var(--white-2);
+  color: var(--color-text);
   font-size: var(--fs-5);
   font-weight: var(--fw-400);
   padding: 13px 20px;
-  border: 1px solid var(--jet);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   outline: none;
 }
@@ -56,12 +56,12 @@
 }
 
 .input:focus {
-  border-color: var(--sky-blue-crayola);
+  border-color: var(--color-accent);
 }
 
 .input[aria-invalid="true"],
 .input:focus:invalid {
-  border-color: var(--bittersweet-shimmer);
+  border-color: var(--color-danger);
 }
 
 .textarea {
@@ -77,7 +77,7 @@
 }
 
 .fieldError {
-  color: var(--bittersweet-shimmer);
+  color: var(--color-danger);
   font-size: var(--fs-8);
   padding-left: 4px;
 }
@@ -86,7 +86,7 @@
   position: relative;
   width: 100%;
   background: var(--border-gradient-onyx);
-  color: var(--sky-blue-crayola);
+  color: var(--color-accent);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -128,15 +128,15 @@
   padding: 10px 14px;
   border-radius: 10px;
   margin-bottom: 15px;
-  border: 1px solid var(--jet);
+  border: 1px solid var(--color-border);
 }
 
 .success {
-  color: var(--success);
+  color: var(--color-success);
 }
 
 .error {
-  color: var(--bittersweet-shimmer);
+  color: var(--color-danger);
 }
 
 @media (min-width: 576px) {
@@ -153,7 +153,7 @@
 @media (min-width: 768px) {
   .box {
     padding: 20px;
-    border: 1px solid var(--jet);
+    border: 1px solid var(--color-border);
     box-shadow: var(--shadow-1);
   }
 
