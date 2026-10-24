@@ -58,3 +58,6 @@ next-env.d.ts
 
 # SQLite database (local data)
 /data/
+
+# local Claude Code launch config
+/.claude/
