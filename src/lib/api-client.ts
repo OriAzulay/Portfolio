@@ -1,4 +1,5 @@
 import type { ContactMessage } from "@/types/contact";
+import type { GitHubRepo, GitHubSettings } from "./github";
 import type { ImageKind, PortfolioData } from "@/types/portfolio";
 import type { ContactMessageInput } from "./validation/contact";
 
@@ -57,6 +58,18 @@ export const api = {
 
   deleteMessage: (id: number) =>
     request<{ success: true }>(`/api/messages/${id}`, { method: "DELETE" }),
+
+  getGitHubSettings: () => request<GitHubSettings>("/api/github/settings", { cache: "no-store" }),
+
+  /** token: undefined keeps the saved token, "" removes it. */
+  saveGitHubSettings: (settings: { username: string; token?: string }) =>
+    request<GitHubSettings>("/api/github/settings", { method: "PUT", body: json(settings) }),
+
+  listGitHubRepos: (refresh = false) =>
+    request<{ username: string; repos: GitHubRepo[]; fetchedAt: string }>(
+      `/api/github/repos${refresh ? "?refresh=1" : ""}`,
+      { cache: "no-store" }
+    ),
 
   trackVisit: () => request<void>("/api/visits", { method: "POST", keepalive: true }),
 };

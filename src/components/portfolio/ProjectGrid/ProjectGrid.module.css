@@ -21,7 +21,7 @@
   position: absolute;
   inset: 1px;
   border-radius: inherit;
-  background: var(--eerie-black-1);
+  background: var(--color-surface-2);
   z-index: -1;
 }
 
@@ -38,8 +38,8 @@
   transition: transform var(--transition-1);
 }
 
-.card:hover .banner img,
-.card:focus-visible .banner img {
+.clickable:hover .banner img,
+.clickable:focus-within .banner img {
   transform: scale(1.05);
 }
 
@@ -54,13 +54,13 @@
   flex-wrap: wrap;
   gap: 7px;
   margin-bottom: 10px;
-  color: var(--light-gray-70);
+  color: var(--color-text-subtle);
   font-size: var(--fs-6);
   font-weight: var(--fw-300);
 }
 
 .dot {
-  background: var(--light-gray-70);
+  background: var(--color-text-subtle);
   width: 4px;
   height: 4px;
   border-radius: 4px;
@@ -72,13 +72,13 @@
   transition: color var(--transition-1);
 }
 
-.card:hover .title,
-.card:focus-visible .title {
-  color: var(--sky-blue-crayola);
+.clickable:hover .title,
+.clickable:focus-within .title {
+  color: var(--color-accent);
 }
 
 .text {
-  color: var(--light-gray);
+  color: var(--color-text-muted);
   font-size: var(--fs-6);
   font-weight: var(--fw-300);
   line-height: 1.6;
@@ -92,8 +92,8 @@
 }
 
 .tag {
-  color: var(--light-gray);
-  background: var(--onyx);
+  color: var(--color-text-muted);
+  background: var(--color-chip);
   font-size: var(--fs-8);
   padding: 3px 10px;
   border-radius: 8px;
@@ -113,4 +113,48 @@
   .list {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+.stretchedLink {
+  display: inline;
+  color: inherit;
+  outline: none;
+}
+
+.stretchedLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.clickable:focus-within {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.github {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.github svg {
+  width: 13px;
+  height: 13px;
+}
+
+.liveLink {
+  position: relative;
+  z-index: 2; /* above the stretched card link */
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--color-accent);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-500);
+}
+
+.liveLink:hover,
+.liveLink:focus-visible {
+  text-decoration: underline;
 }

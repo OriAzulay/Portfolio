@@ -94,3 +94,50 @@ export function GitHubIcon() {
     </svg>
   );
 }
+
+export function CodeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" {...stroke} />
+    </svg>
+  );
+}
+
+export function ShieldIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" {...stroke} />
+    </svg>
+  );
+}
+
+export function HeartIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+        {...stroke}
+      />
+    </svg>
+  );
+}
+
+export function SunIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.5" {...stroke} />
+      <path
+        d="M12 1.5v2.5M12 20v2.5M4.22 4.22l1.77 1.77M18.01 18.01l1.77 1.77M1.5 12h2.5M20 12h2.5M4.22 19.78l1.77-1.77M18.01 5.99l1.77-1.77"
+        {...stroke}
+      />
+    </svg>
+  );
+}
+
+export function MoonIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" {...stroke} />
+    </svg>
+  );
+}

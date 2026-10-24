@@ -12,13 +12,15 @@ import { sanitizeRichText } from "./sanitize";
 
 const SECTION_KEYS = Object.keys(portfolioSectionSchemas) as PortfolioSectionKey[];
 
+const sanitizeEntries = <T extends { description: string }>(items: T[]): T[] =>
+  items.map((item) => ({ ...item, description: sanitizeRichText(item.description) }));
+
 function sanitize(data: PortfolioData): PortfolioData {
   return {
     ...data,
-    experience: data.experience.map((item) => ({
-      ...item,
-      description: sanitizeRichText(item.description),
-    })),
+    experience: sanitizeEntries(data.experience),
+    militaryService: sanitizeEntries(data.militaryService),
+    volunteering: sanitizeEntries(data.volunteering),
   };
 }
 

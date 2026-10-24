@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { DashboardApp } from "@/components/dashboard/DashboardApp";
 import { isAdmin } from "@/server/auth/session";
 import { listMessages } from "@/server/services/contact.service";
+import { getGitHubSettings } from "@/server/services/github.service";
 import { getPortfolio } from "@/server/services/portfolio.service";
 import { countUniqueVisitors } from "@/server/services/visit.service";
 
@@ -16,6 +17,7 @@ export default async function DashboardPage() {
       initialData={getPortfolio()}
       initialMessages={listMessages()}
       visitorCount={countUniqueVisitors()}
+      githubSettings={getGitHubSettings()}
     />
   );
 }

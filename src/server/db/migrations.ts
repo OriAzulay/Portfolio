@@ -41,6 +41,14 @@ const migrations: string[] = [
     last_seen  TEXT NOT NULL DEFAULT (datetime('now'))
   );
   `,
+
+  /* 2: key/value settings (e.g. GitHub username + token, never sent to the client) */ `
+  CREATE TABLE settings (
+    key        TEXT PRIMARY KEY,
+    value      TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  `,
 ];
 
 export function runMigrations(db: Database.Database): void {

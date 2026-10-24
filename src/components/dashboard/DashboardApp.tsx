@@ -3,25 +3,29 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ContactMessage } from "@/types/contact";
-import type { PortfolioData } from "@/types/portfolio";
+import type { PortfolioData, Project } from "@/types/portfolio";
 import { api, ApiError } from "@/lib/api-client";
 import { defaultPortfolioData } from "@/lib/defaults";
+import { syncProjectWithRepo, type GitHubSettings } from "@/lib/github";
 import { cn } from "@/lib/utils";
 import form from "@/components/ui/Form.module.css";
+import { ThemeToggle } from "@/components/ui/ThemeToggle/ThemeToggle";
 import { GalleryEditor } from "./editors/GalleryEditor";
 import { ProfileEditor } from "./editors/ProfileEditor";
 import { ProjectsEditor } from "./editors/ProjectsEditor";
 import { ResumeEditor } from "./editors/ResumeEditor";
+import { GitHubPanel } from "./GitHubPanel/GitHubPanel";
 import { MessagesInbox } from "./MessagesInbox/MessagesInbox";
 import styles from "./DashboardApp.module.css";
 
-type TabId = "profile" | "resume" | "projects" | "gallery" | "messages";
+type TabId = "profile" | "resume" | "projects" | "github" | "gallery" | "messages";
 type Notice = { type: "success" | "error"; text: string } | null;
 
 type Props = {
   initialData: PortfolioData;
   initialMessages: ContactMessage[];
   visitorCount: number;
+  githubSettings: GitHubSettings;
 };
 
 function describeSaveError(error: unknown): string {
@@ -34,7 +38,18 @@ function describeSaveError(error: unknown): string {
   return error.message;
 }
 
-export function DashboardApp({ initialData, initialMessages, visitorCount }: Props) {
+/** Refreshes a GitHub-linked project from the (server-cached) repository list. */
+async function syncFromGitHub(project: Project): Promise<Project> {
+  if (!project.github) return project;
+  const { repos } = await api.listGitHubRepos(true).catch((error: unknown) => {
+    throw new Error(error instanceof ApiError ? error.message : "Couldn't reach GitHub");
+  });
+  const repo = repos.find((r) => r.id === project.github?.repoId);
+  if (!repo) throw new Error("Repository not found - it may have been deleted or made private.");
+  return syncProjectWithRepo(project, repo);
+}
+
+export function DashboardApp({ initialData, initialMessages, visitorCount, githubSettings }: Props) {
   const router = useRouter();
   const [data, setData] = useState(initialData);
   const [savedJson, setSavedJson] = useState(() => JSON.stringify(initialData));
@@ -88,6 +103,7 @@ export function DashboardApp({ initialData, initialMessages, visitorCount }: Pro
     { id: "profile", label: "Profile" },
     { id: "resume", label: "Resume" },
     { id: "projects", label: "Projects" },
+    { id: "github", label: "GitHub" },
     { id: "gallery", label: "Gallery" },
     { id: "messages", label: unread ? `Messages (${unread})` : "Messages" },
   ];
@@ -95,11 +111,14 @@ export function DashboardApp({ initialData, initialMessages, visitorCount }: Pro
   return (
     <main className={styles.main}>
       <header className={styles.topbar}>
-        <div>
-          <h1 className={styles.title}>Admin Dashboard</h1>
-          <p className={styles.stats}>
-            {visitorCount} unique visitors · {unread} unread messages
-          </p>
+        <div className={styles.titleRow}>
+          <ThemeToggle />
+          <div>
+            <h1 className={styles.title}>Admin Dashboard</h1>
+            <p className={styles.stats}>
+              {visitorCount} unique visitors · {unread} unread messages
+            </p>
+          </div>
         </div>
         <div className={styles.actions}>
           <button
@@ -146,15 +165,26 @@ export function DashboardApp({ initialData, initialMessages, visitorCount }: Pro
         {activeTab === "profile" && <ProfileEditor value={data.personalInfo} onChange={update("personalInfo")} />}
         {activeTab === "resume" && (
           <ResumeEditor
-            experience={data.experience}
-            education={data.education}
-            skills={data.skills}
-            onExperienceChange={update("experience")}
-            onEducationChange={update("education")}
-            onSkillsChange={update("skills")}
+            data={data}
+            onChange={(key, value) => setData((prev) => ({ ...prev, [key]: value }))}
+            linkedKeyProjects={data.projects.filter((p) => p.showInKeyProjects).length}
           />
         )}
-        {activeTab === "projects" && <ProjectsEditor value={data.projects} onChange={update("projects")} />}
+        {activeTab === "projects" && (
+          <ProjectsEditor
+            value={data.projects}
+            onChange={update("projects")}
+            onSync={syncFromGitHub}
+            onOpenGitHub={() => setActiveTab("github")}
+          />
+        )}
+        {activeTab === "github" && (
+          <GitHubPanel
+            initialSettings={githubSettings}
+            projects={data.projects}
+            onProjectsChange={update("projects")}
+          />
+        )}
         {activeTab === "gallery" && <GalleryEditor value={data.gallery} onChange={update("gallery")} />}
         {activeTab === "messages" && <MessagesInbox messages={messages} onMessagesChange={setMessages} />}
       </div>
