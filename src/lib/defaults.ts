@@ -1,0 +1,95 @@
+import type { PortfolioData } from "@/types/portfolio";
+
+/** Starter content shown until the portfolio is edited in the dashboard. */
+export const defaultPortfolioData: PortfolioData = {
+  personalInfo: {
+    name: "Your Name",
+    title: "Software Developer",
+    avatarUrl: "",
+    email: "your.email@example.com",
+    phone: "+1 234 567 8900",
+    location: "Your City, Country",
+    about: `I'm a passionate Software Developer with expertise in building modern web applications.
+I love creating elegant solutions to complex problems and am always eager to learn new technologies.
+With a strong foundation in both frontend and backend development, I strive to deliver high-quality, scalable solutions that make a real impact.`,
+    social: {
+      github: "https://github.com/yourusername",
+      linkedin: "https://linkedin.com/in/yourusername",
+      twitter: "",
+      instagram: "",
+    },
+    stats: {
+      yearsExperience: "3+",
+      projectsCompleted: "15+",
+      certificationsAwards: "5+",
+    },
+  },
+  skills: [
+    { name: "JavaScript", level: 90 },
+    { name: "TypeScript", level: 85 },
+    { name: "React", level: 90 },
+    { name: "Next.js", level: 80 },
+    { name: "Node.js", level: 75 },
+    { name: "Python", level: 70 },
+    { name: "SQL", level: 75 },
+    { name: "Git", level: 85 },
+  ],
+  skillGroups: [],
+  keyProjects: [],
+  militaryService: [],
+  volunteering: [],
+  experience: [
+    {
+      title: "Software Developer",
+      company: "Company Name",
+      period: "2023 - Present",
+      description: "Developing and maintaining web applications using React and Node.js.",
+    },
+    {
+      title: "Junior Developer",
+      company: "Previous Company",
+      period: "2021 - 2023",
+      description: "Built responsive web interfaces and collaborated with cross-functional teams.",
+    },
+  ],
+  education: [
+    {
+      degree: "Bachelor's in Computer Science",
+      school: "University Name",
+      period: "2017 - 2021",
+    },
+  ],
+  projects: [
+    {
+      title: "Project One",
+      description: "A full-stack web application built with React and Node.js",
+      tags: ["React", "Node.js", "MongoDB"],
+      link: "#",
+      liveUrl: "",
+      imageUrl: "",
+      showInKeyProjects: false,
+      github: null,
+    },
+    {
+      title: "Project Two",
+      description: "Mobile-responsive e-commerce platform with payment integration",
+      tags: ["Next.js", "Stripe", "Tailwind"],
+      link: "#",
+      liveUrl: "",
+      imageUrl: "",
+      showInKeyProjects: false,
+      github: null,
+    },
+    {
+      title: "Project Three",
+      description: "Real-time chat application with WebSocket support",
+      tags: ["React", "Socket.io", "Express"],
+      link: "#",
+      liveUrl: "",
+      imageUrl: "",
+      showInKeyProjects: false,
+      github: null,
+    },
+  ],
+  gallery: [],
+};

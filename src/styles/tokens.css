@@ -1,0 +1,135 @@
+/*-----------------------------------*\
+  Design tokens
+  Every color, font, size, shadow and transition used by the component
+  CSS Modules lives here. Colors are semantic (--color-text, --color-surface…)
+  and redefined per theme; the root layout sets <html data-theme="dark|light">
+  before the first paint (system preference by default, user choice persisted).
+\*-----------------------------------*/
+
+/* ---------- Dark theme (default) ---------- */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* gradients */
+  --bg-gradient-onyx: linear-gradient(to bottom right, hsl(240, 1%, 25%) 3%, hsl(0, 0%, 19%) 97%);
+  --bg-gradient-jet: linear-gradient(to bottom right, hsla(240, 1%, 18%, 0.251) 0%, hsla(240, 2%, 11%, 0) 100%),
+    hsl(240, 2%, 13%);
+  --bg-gradient-blue-1: linear-gradient(to bottom right, hsl(190, 82%, 72%) 0%, hsla(36, 100%, 69%, 0) 50%);
+  --bg-gradient-blue-2: linear-gradient(135deg, hsla(190, 82%, 72%, 0.251) 0%, hsla(35, 100%, 68%, 0) 59.86%),
+    hsl(240, 2%, 13%);
+  --border-gradient-onyx: linear-gradient(to bottom right, hsl(0, 0%, 25%) 0%, hsla(0, 0%, 25%, 0) 50%);
+  --text-gradient-blue: linear-gradient(to right, hsl(190, 82%, 72%), hsl(190, 51%, 55%));
+
+  /* surfaces */
+  --color-bg: hsl(0, 0%, 7%);
+  --color-surface: hsl(240, 2%, 12%);
+  --color-surface-2: hsl(240, 2%, 13%);
+  --color-chip: hsl(240, 1%, 17%);
+  --color-border: hsl(0, 0%, 22%);
+  --color-nav-bg: hsla(240, 1%, 17%, 0.8);
+
+  /* text */
+  --color-text-strong: hsl(0, 0%, 100%);
+  --color-text: hsl(0, 0%, 98%);
+  --color-text-muted: hsl(0, 0%, 84%);
+  --color-text-subtle: hsla(0, 0%, 84%, 0.7);
+
+  /* accents / status */
+  --color-accent: hsl(190, 82%, 72%);
+  --color-accent-2: hsl(190, 51%, 55%);
+  --color-accent-soft: hsla(190, 82%, 72%, 0.35);
+  --color-danger: hsl(0, 43%, 51%);
+  --color-success: hsl(150, 60%, 55%);
+
+  /* shadows */
+  --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.25);
+  --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.25);
+  --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.25);
+  --shadow-4: 0 25px 50px hsla(0, 0%, 0%, 0.15);
+  --shadow-5: 0 24px 80px hsla(0, 0%, 0%, 0.25);
+}
+
+/* ---------- Light theme ---------- */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-gradient-onyx: linear-gradient(to bottom right, hsl(220, 14%, 92%) 3%, hsl(220, 14%, 85%) 97%);
+  --bg-gradient-jet: linear-gradient(to bottom right, hsla(0, 0%, 100%, 0.9) 0%, hsla(220, 20%, 97%, 0) 100%),
+    hsl(220, 20%, 98%);
+  --bg-gradient-blue-1: linear-gradient(to bottom right, hsl(192, 75%, 45%) 0%, hsla(192, 75%, 45%, 0) 50%);
+  --bg-gradient-blue-2: linear-gradient(135deg, hsla(192, 75%, 45%, 0.14) 0%, hsla(192, 75%, 45%, 0) 60%),
+    hsl(0, 0%, 100%);
+  --border-gradient-onyx: linear-gradient(to bottom right, hsl(220, 13%, 80%) 0%, hsla(220, 13%, 80%, 0) 55%);
+  --text-gradient-blue: linear-gradient(to right, hsl(192, 75%, 42%), hsl(192, 60%, 32%));
+
+  --color-bg: hsl(220, 20%, 95%);
+  --color-surface: hsl(0, 0%, 100%);
+  --color-surface-2: hsl(220, 25%, 98%);
+  --color-chip: hsl(220, 18%, 92%);
+  --color-border: hsl(220, 13%, 86%);
+  --color-nav-bg: hsla(0, 0%, 100%, 0.82);
+
+  --color-text-strong: hsl(222, 35%, 8%);
+  --color-text: hsl(222, 28%, 13%);
+  --color-text-muted: hsl(220, 12%, 30%);
+  --color-text-subtle: hsl(220, 9%, 42%);
+
+  --color-accent: hsl(192, 80%, 32%);
+  --color-accent-2: hsl(192, 65%, 30%);
+  --color-accent-soft: hsla(192, 80%, 32%, 0.3);
+  --color-danger: hsl(0, 62%, 44%);
+  --color-success: hsl(150, 60%, 30%);
+
+  --shadow-1: -4px 8px 24px hsla(222, 30%, 20%, 0.08);
+  --shadow-2: 0 12px 28px hsla(222, 30%, 20%, 0.08);
+  --shadow-3: 0 12px 32px hsla(222, 30%, 20%, 0.1);
+  --shadow-4: 0 20px 40px hsla(222, 30%, 20%, 0.08);
+  --shadow-5: 0 20px 60px hsla(222, 30%, 20%, 0.1);
+}
+
+/* ---------- Theme-independent tokens ---------- */
+:root {
+  /* typography (font variables come from next/font in the root layout) */
+  --ff-poppins: var(--font-poppins), "Poppins", sans-serif;
+  --ff-courgette: var(--font-courgette), "Courgette", cursive;
+
+  --fs-1: 24px;
+  --fs-2: 18px;
+  --fs-3: 17px;
+  --fs-4: 16px;
+  --fs-5: 15px;
+  --fs-6: 14px;
+  --fs-7: 13px;
+  --fs-8: 11px;
+
+  --fw-300: 300;
+  --fw-400: 400;
+  --fw-500: 500;
+  --fw-600: 600;
+
+  /* transitions */
+  --transition-1: 0.25s ease;
+  --transition-2: 0.5s ease-in-out;
+}
+
+@media (min-width: 576px) {
+  :root {
+    --fs-1: 32px;
+    --fs-2: 24px;
+    --fs-3: 26px;
+    --fs-4: 18px;
+    --fs-6: 15px;
+    --fs-7: 15px;
+    --fs-8: 12px;
+  }
+}
+
+/* Softer shadows on large screens (dark theme; light shadows are already soft). */
+@media (min-width: 1024px) {
+  :root:not([data-theme="light"]) {
+    --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.125);
+    --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.125);
+    --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.125);
+  }
+}

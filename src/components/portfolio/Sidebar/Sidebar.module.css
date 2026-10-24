@@ -1,0 +1,293 @@
+.sidebar {
+  margin-bottom: 15px;
+  max-height: 112px;
+  overflow: hidden;
+  transition: var(--transition-2);
+}
+
+.sidebar.open {
+  max-height: 405px;
+}
+
+.info {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatarBox {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.avatar {
+  background: var(--bg-gradient-onyx);
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
+.name {
+  color: var(--color-text);
+  font-family: var(--ff-courgette);
+  font-size: var(--fs-2);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.title {
+  color: var(--color-text-strong);
+  background: var(--color-chip);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-300);
+  width: max-content;
+  padding: 3px 12px;
+  border-radius: 8px;
+}
+
+.moreBtn {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  border-radius: 0 15px;
+  font-size: 13px;
+  color: var(--color-accent);
+  background: var(--border-gradient-onyx);
+  padding: 10px;
+  box-shadow: var(--shadow-2);
+  transition: var(--transition-1);
+  z-index: 1;
+}
+
+.moreBtn::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: var(--bg-gradient-jet);
+  transition: var(--transition-1);
+  z-index: -1;
+}
+
+.moreBtn:hover,
+.moreBtn:focus-visible {
+  background: var(--bg-gradient-blue-1);
+}
+
+.moreBtn:hover::before,
+.moreBtn:focus-visible::before {
+  background: var(--bg-gradient-blue-2);
+}
+
+.moreLabel {
+  display: none;
+}
+
+.chevron {
+  display: block;
+  transition: transform var(--transition-1);
+}
+
+.open .chevron {
+  transform: rotate(180deg);
+}
+
+.more {
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-2);
+}
+
+.open .more {
+  opacity: 1;
+  visibility: visible;
+}
+
+.separator {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border);
+  margin: 16px 0;
+}
+
+.contactsList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.contactItem {
+  min-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.contactInfo {
+  max-width: calc(100% - 46px);
+  width: calc(100% - 46px);
+}
+
+.contactTitle {
+  color: var(--color-text-subtle);
+  font-size: var(--fs-8);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.contactValue {
+  color: var(--color-text);
+  font-size: var(--fs-7);
+  font-style: normal;
+}
+
+.socialList {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 4px;
+  padding-left: 7px;
+}
+
+.socialLink {
+  color: var(--color-text-subtle);
+  transition: color 0.5s ease, transform 0.5s ease;
+}
+
+.socialLink:hover,
+.socialLink:focus-visible {
+  color: var(--color-accent);
+  transform: scale(1.1);
+}
+
+@media (min-width: 576px) {
+  .sidebar {
+    max-height: 180px;
+    margin-bottom: 30px;
+  }
+
+  .sidebar.open {
+    max-height: 584px;
+  }
+
+  .info {
+    gap: 25px;
+  }
+
+  .avatarBox {
+    border-radius: 15px;
+  }
+
+  .avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .name {
+    margin-bottom: 15px;
+  }
+
+  .title {
+    padding: 5px 18px;
+  }
+
+  .moreBtn {
+    top: -30px;
+    right: -30px;
+    padding: 10px 15px;
+  }
+
+  .moreLabel {
+    display: block;
+    font-size: var(--fs-8);
+  }
+
+  .chevron {
+    display: none;
+  }
+
+  .separator {
+    margin: 32px 0;
+  }
+
+  .contactsList {
+    gap: 20px;
+  }
+
+  .contactInfo {
+    max-width: calc(100% - 64px);
+    width: calc(100% - 64px);
+  }
+}
+
+@media (min-width: 768px) {
+  .contactsList {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 15px;
+  }
+}
+
+@media (min-width: 1250px) {
+  .sidebar {
+    position: sticky;
+    top: 50px;
+    max-height: max-content;
+    height: 100%;
+    margin-bottom: 0;
+    z-index: 1;
+  }
+
+  .info {
+    flex-direction: column;
+    margin-top: 10px;
+  }
+
+  .avatar {
+    width: 170px;
+    height: 170px;
+  }
+
+  .name {
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .title {
+    margin: auto;
+  }
+
+  .moreBtn {
+    display: none;
+  }
+
+  .more {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .contactsList {
+    grid-template-columns: 1fr;
+  }
+
+  .contactValue {
+    font-size: 14px;
+    font-weight: var(--fw-300);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .separatorLast {
+    margin: 15px 0;
+    opacity: 0;
+  }
+
+  .socialList {
+    justify-content: center;
+  }
+}
