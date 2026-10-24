@@ -44,7 +44,7 @@ const force = process.argv.includes("--force");
 /** Exits with a clear message unless both Supabase settings look real. */
 function assertSupabaseConfig(): void {
   const problems: string[] = [];
-  const where = "Supabase dashboard > Project Settings > API";
+  const where = "your Supabase project (Connect button, or Project Settings > Data API / API Keys)";
 
   if (!urlEnv) {
     problems.push(`${URL_VARS[0]} is missing. Copy the "Project URL" from ${where}.`);
@@ -61,9 +61,11 @@ function assertSupabaseConfig(): void {
   }
 
   if (!keyEnv) {
-    problems.push(`${KEY_VARS[0]} is missing. Copy the "service_role" secret from ${where}.`);
+    problems.push(`${KEY_VARS[0]} is missing. Copy a secret key (sb_secret_... or legacy service_role) from ${where}.`);
   } else if ((SUPABASE_KEY ?? "").length < 30) {
-    problems.push(`${keyEnv.name} looks like a placeholder. Copy the "service_role" secret from ${where}.`);
+    problems.push(
+      `${keyEnv.name} looks like a placeholder. Copy a secret key (sb_secret_... or legacy service_role) from ${where}.`
+    );
   }
 
   if (problems.length > 0) {
@@ -78,7 +80,11 @@ type Json = Record<string, unknown>;
 
 async function supabaseSelect<T>(table: string, query: string): Promise<T[]> {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, {
-    headers: { apikey: SUPABASE_KEY!, Authorization: `Bearer ${SUPABASE_KEY}` },
+    // Legacy service_role keys are JWTs and also go in Authorization;
+    // the newer sb_secret_... keys must only be sent as `apikey`.
+    headers: SUPABASE_KEY!.startsWith("eyJ")
+      ? { apikey: SUPABASE_KEY!, Authorization: `Bearer ${SUPABASE_KEY}` }
+      : { apikey: SUPABASE_KEY! },
   });
   if (!response.ok) {
     throw new Error(`Supabase ${table}: HTTP ${response.status} ${await response.text()}`);
