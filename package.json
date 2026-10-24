@@ -7,38 +7,33 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
-    "db:migrate-supabase": "tsx --conditions=react-server scripts/migrate-from-supabase.ts",
-    "db:optimize-images": "tsx --conditions=react-server scripts/optimize-images.ts",
     "test": "vitest",
-    "test:ci": "vitest run"
+    "test:ci": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.118.0",
-    "better-sqlite3": "^13.0.3",
-    "jose": "^6.2.12",
+    "@supabase/supabase-js": "^2.93.3",
+    "@vercel/analytics": "^1.6.1",
+    "dompurify": "^3.3.1",
     "next": "16.1.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "sanitize-html": "^2.18.1",
-    "server-only": "^0.0.1",
-    "sharp": "^0.35.5",
-    "zod": "^4.6.7"
+    "resend": "^6.9.1"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^9.6.0",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/sanitize-html": "^2.16.2",
+    "@vitejs/plugin-react": "^5.1.4",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
-    "tsx": "^4.23.15",
+    "jsdom": "^28.1.0",
+    "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.12"
-  },
-  "engines": {
-    "node": ">=20.9.0"
+    "vitest": "^4.0.18"
   }
 }
