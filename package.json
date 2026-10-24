@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:migrate-supabase": "tsx --conditions=react-server scripts/migrate-from-supabase.ts",
-    "db:optimize-images": "tsx --conditions=react-server scripts/optimize-images.ts"
+    "db:optimize-images": "tsx --conditions=react-server scripts/optimize-images.ts",
+    "test": "vitest",
+    "test:ci": "vitest run"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -33,7 +35,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
     "tsx": "^4.23.15",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.12"
   },
   "engines": {
     "node": ">=20.9.0"

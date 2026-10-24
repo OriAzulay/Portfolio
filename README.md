@@ -32,6 +32,8 @@ The database (`data/portfolio.db`) is created automatically on first request.
 | `ADMIN_PASSWORD` | yes             | Password for `/login`                                                       |
 | `SESSION_SECRET` | yes (prod)      | 32+ random characters; signs the session cookie and salts IP hashes         |
 | `DATABASE_PATH`  | no              | Path to the SQLite file. Defaults to `./data/portfolio.db`                  |
+| `RESEND_API_KEY` | no              | Also email new contact messages via [Resend](https://resend.com)            |
+| `CONTACT_NOTIFY_EMAIL` | no        | Where those emails go (defaults to the email on your profile)             |
 
 Generate a secret:
 
@@ -47,7 +49,14 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | `npm run build` / `npm start` | Production build / server                            |
 | `npm run lint`                | ESLint                                               |
 | `npm run typecheck`           | TypeScript check                                     |
+| `npm test` / `npm run test:ci` | Vitest (watch / single run)                        |
+| `npm run db:optimize-images`  | Re-compress images already stored in SQLite          |
 | `npm run db:migrate-supabase` | One-time import from the old Supabase setup (below)  |
+
+## Tests & CI
+
+Tests live in `__tests__/` (Vitest) and cover validation, sanitizing, the contact form (honeypot, rate limit), image processing and the GitHub mapping. Each test file uses its own throwaway SQLite database.
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck, tests and build on every push and pull request to `main`.
 
 ## Architecture
 

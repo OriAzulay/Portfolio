@@ -4,6 +4,7 @@ import { contactMessageSchema } from "@/lib/validation/contact";
 import type { ContactMessage } from "@/types/contact";
 import { AppError } from "../http/errors";
 import { messagesRepository } from "../repositories/messages.repository";
+import { notifyNewContactMessage } from "./notify.service";
 
 const RATE_LIMIT_MAX = 3;
 const RATE_LIMIT_WINDOW_MINUTES = 10;
@@ -11,8 +12,9 @@ const RATE_LIMIT_WINDOW_MINUTES = 10;
 /**
  * Stores a message from the public contact form.
  * Honeypot submissions are accepted silently (so bots see "success") but discarded.
+ * If email notifications are configured, an email is sent after saving.
  */
-export function submitContactMessage(input: unknown, ipHash: string): void {
+export async function submitContactMessage(input: unknown, ipHash: string): Promise<void> {
   const data = contactMessageSchema.parse(input);
   if (data.website) return;
 
@@ -26,6 +28,7 @@ export function submitContactMessage(input: unknown, ipHash: string): void {
     message: data.message,
     ipHash,
   });
+  await notifyNewContactMessage(data);
 }
 
 export function listMessages(): ContactMessage[] {
