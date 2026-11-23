@@ -43,7 +43,7 @@ export async function storeImageBytes(
 
   const optimized = await optimizeImage(bytes, mimeType, kind);
   const id = crypto.randomUUID();
-  imagesRepository.insert({ id, kind, mimeType: optimized.mimeType, data: optimized.data });
+  await imagesRepository.insert({ id, kind, mimeType: optimized.mimeType, data: optimized.data });
   return { id, url: imageUrl(id), size: optimized.data.length };
 }
 
@@ -55,8 +55,8 @@ export async function storeUploadedImage(file: unknown, kind: unknown) {
   return storeImageBytes(Buffer.from(await file.arrayBuffer()), parseImageKind(kind));
 }
 
-export function getImage(id: string): StoredImage {
-  const image = UUID_PATTERN.test(id) ? imagesRepository.findById(id) : null;
+export async function getImage(id: string): Promise<StoredImage> {
+  const image = UUID_PATTERN.test(id) ? await imagesRepository.findById(id) : null;
   if (!image) throw new AppError(404, "Image not found");
   return image;
 }
@@ -64,12 +64,12 @@ export function getImage(id: string): StoredImage {
 /** Re-compresses already stored images in place (same id, so existing links keep working). */
 export async function optimizeStoredImages(): Promise<{ id: string; before: number; after: number }[]> {
   const changed: { id: string; before: number; after: number }[] = [];
-  for (const meta of imagesRepository.listMeta()) {
-    const image = imagesRepository.findById(meta.id);
+  for (const meta of await imagesRepository.listMeta()) {
+    const image = await imagesRepository.findById(meta.id);
     if (!image) continue;
     const optimized = await optimizeImage(image.data, image.mimeType, parseImageKind(meta.kind));
     if (optimized.data.length < image.size) {
-      imagesRepository.updateData(meta.id, optimized.mimeType, optimized.data);
+      await imagesRepository.updateData(meta.id, optimized.mimeType, optimized.data);
       changed.push({ id: meta.id, before: image.size, after: optimized.data.length });
     }
   }
@@ -77,7 +77,7 @@ export async function optimizeStoredImages(): Promise<{ id: string; before: numb
 }
 
 /** Removes stored images no longer referenced by the portfolio (keeps uploads from the last hour). */
-export function removeUnusedImages(data: PortfolioData): number {
+export function removeUnusedImages(data: PortfolioData): Promise<number> {
   const referenced = new Set(
     Array.from(JSON.stringify(data).matchAll(IMAGE_URL_PATTERN), (match) => match[1])
   );

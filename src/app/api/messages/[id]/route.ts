@@ -8,7 +8,7 @@ type Context = { params: Promise<{ id: string }> };
 export async function PATCH(request: Request, { params }: Context) {
   try {
     await requireAdmin();
-    updateMessage((await params).id, await readJson(request));
+    await updateMessage((await params).id, await readJson(request));
     return NextResponse.json({ success: true });
   } catch (error) {
     return errorResponse(error);
@@ -18,7 +18,7 @@ export async function PATCH(request: Request, { params }: Context) {
 export async function DELETE(_request: Request, { params }: Context) {
   try {
     await requireAdmin();
-    deleteMessage((await params).id);
+    await deleteMessage((await params).id);
     return NextResponse.json({ success: true });
   } catch (error) {
     return errorResponse(error);

@@ -23,7 +23,7 @@ export async function notifyNewContactMessage(msg: NewMessage): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return;
 
-  const to = process.env.CONTACT_NOTIFY_EMAIL || getPortfolio().personalInfo.email;
+  const to = process.env.CONTACT_NOTIFY_EMAIL || (await getPortfolio()).personalInfo.email;
   if (!to) return;
 
   const body = escapeHtml(msg.message).replace(/\r?\n/g, "<br>");

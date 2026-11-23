@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Native modules (SQLite driver, image processing) must stay runtime requires, not be bundled.
-  serverExternalPackages: ["better-sqlite3", "sharp"],
+  // Native / platform-specific packages (libSQL driver, image processing) stay runtime requires.
+  serverExternalPackages: ["@libsql/client", "libsql", "sharp"],
   poweredByHeader: false,
 
   async headers() {

@@ -6,7 +6,7 @@ import { verifyAdminLogin } from "@/server/services/auth.service";
 
 export async function POST(request: Request) {
   try {
-    verifyAdminLogin(await readJson(request), getClientIpHash(request));
+    await verifyAdminLogin(await readJson(request), getClientIpHash(request));
     await createSession();
     return NextResponse.json({ success: true });
   } catch (error) {

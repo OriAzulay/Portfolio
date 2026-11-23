@@ -1,66 +1,65 @@
 import "server-only";
-import { getDb } from "../db/client";
+import type { Row } from "@libsql/client";
 import type { ContactMessage } from "@/types/contact";
+import { getDb } from "../db/client";
 
-type MessageRow = {
-  id: number;
-  name: string;
-  email: string;
-  message: string;
-  isRead: number;
-  createdAt: string;
-};
-
-const toMessage = (row: MessageRow): ContactMessage => ({
-  ...row,
-  isRead: row.isRead === 1,
+const toMessage = (row: Row): ContactMessage => ({
+  id: Number(row.id),
+  name: String(row.name),
+  email: String(row.email),
+  message: String(row.message),
+  isRead: Number(row.is_read) === 1,
   // SQLite datetime('now') is UTC without a zone marker.
-  createdAt: `${row.createdAt.replace(" ", "T")}Z`,
+  createdAt: `${String(row.created_at).replace(" ", "T")}Z`,
 });
 
 export const messagesRepository = {
-  create(input: { name: string; email: string; message: string; ipHash: string }): number {
-    const result = getDb()
-      .prepare("INSERT INTO contact_messages (name, email, message, ip_hash) VALUES (?, ?, ?, ?)")
-      .run(input.name, input.email, input.message, input.ipHash);
+  async create(input: { name: string; email: string; message: string; ipHash: string }): Promise<number> {
+    const db = await getDb();
+    const result = await db.execute({
+      sql: "INSERT INTO contact_messages (name, email, message, ip_hash) VALUES (?, ?, ?, ?)",
+      args: [input.name, input.email, input.message, input.ipHash],
+    });
     return Number(result.lastInsertRowid);
   },
 
-  list(): ContactMessage[] {
-    const rows = getDb()
-      .prepare(
-        `SELECT id, name, email, message, is_read AS isRead, created_at AS createdAt
-         FROM contact_messages ORDER BY created_at DESC, id DESC`
-      )
-      .all() as MessageRow[];
+  async list(): Promise<ContactMessage[]> {
+    const db = await getDb();
+    const { rows } = await db.execute(
+      `SELECT id, name, email, message, is_read, created_at
+       FROM contact_messages ORDER BY created_at DESC, id DESC`
+    );
     return rows.map(toMessage);
   },
 
-  countUnread(): number {
-    const row = getDb()
-      .prepare("SELECT COUNT(*) AS count FROM contact_messages WHERE is_read = 0")
-      .get() as { count: number };
-    return row.count;
+  async countUnread(): Promise<number> {
+    const db = await getDb();
+    const { rows } = await db.execute("SELECT COUNT(*) AS count FROM contact_messages WHERE is_read = 0");
+    return Number(rows[0]?.count ?? 0);
   },
 
-  countRecentByIp(ipHash: string, windowMinutes: number): number {
-    const row = getDb()
-      .prepare(
-        `SELECT COUNT(*) AS count FROM contact_messages
-         WHERE ip_hash = ? AND created_at > datetime('now', ?)`
-      )
-      .get(ipHash, `-${windowMinutes} minutes`) as { count: number };
-    return row.count;
+  async countRecentByIp(ipHash: string, windowMinutes: number): Promise<number> {
+    const db = await getDb();
+    const { rows } = await db.execute({
+      sql: `SELECT COUNT(*) AS count FROM contact_messages
+            WHERE ip_hash = ? AND created_at > datetime('now', ?)`,
+      args: [ipHash, `-${windowMinutes} minutes`],
+    });
+    return Number(rows[0]?.count ?? 0);
   },
 
-  setRead(id: number, isRead: boolean): boolean {
-    const result = getDb()
-      .prepare("UPDATE contact_messages SET is_read = ? WHERE id = ?")
-      .run(isRead ? 1 : 0, id);
-    return result.changes > 0;
+  async setRead(id: number, isRead: boolean): Promise<boolean> {
+    const db = await getDb();
+    const result = await db.execute({
+      sql: "UPDATE contact_messages SET is_read = ? WHERE id = ?",
+      args: [isRead ? 1 : 0, id],
+    });
+    return result.rowsAffected > 0;
   },
 
-  delete(id: number): boolean {
-    return getDb().prepare("DELETE FROM contact_messages WHERE id = ?").run(id).changes > 0;
+  async delete(id: number): Promise<boolean> {
+    const db = await getDb();
+    const result = await db.execute({ sql: "DELETE FROM contact_messages WHERE id = ?", args: [id] });
+    return result.rowsAffected > 0;
   },
 };

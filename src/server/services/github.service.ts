@@ -45,21 +45,22 @@ const settingsSchema = z.object({
   token: z.string().trim().max(255).optional(),
 });
 
-export function getGitHubSettings(): GitHubSettings {
-  return {
-    username: settingsRepository.get(USERNAME_KEY) ?? "",
-    hasToken: Boolean(settingsRepository.get(TOKEN_KEY)),
-  };
+export async function getGitHubSettings(): Promise<GitHubSettings> {
+  const [username, token] = await Promise.all([
+    settingsRepository.get(USERNAME_KEY),
+    settingsRepository.get(TOKEN_KEY),
+  ]);
+  return { username: username ?? "", hasToken: Boolean(token) };
 }
 
-export function updateGitHubSettings(input: unknown): GitHubSettings {
+export async function updateGitHubSettings(input: unknown): Promise<GitHubSettings> {
   const { username, token } = settingsSchema.parse(input);
 
-  if (username) settingsRepository.set(USERNAME_KEY, username);
-  else settingsRepository.delete(USERNAME_KEY);
+  if (username) await settingsRepository.set(USERNAME_KEY, username);
+  else await settingsRepository.delete(USERNAME_KEY);
 
-  if (token === "") settingsRepository.delete(TOKEN_KEY);
-  else if (token) settingsRepository.set(TOKEN_KEY, encrypt(token));
+  if (token === "") await settingsRepository.delete(TOKEN_KEY);
+  else if (token) await settingsRepository.set(TOKEN_KEY, encrypt(token));
 
   repoCache.clear();
   return getGitHubSettings();
@@ -158,10 +159,10 @@ async function fetchAllRepos(username: string, token: string | null): Promise<Gi
 
 /** Lists the configured user's repositories (cached for 10 minutes). */
 export async function listGitHubRepos(options: { refresh?: boolean } = {}) {
-  const { username } = getGitHubSettings();
+  const { username } = await getGitHubSettings();
   if (!username) throw new AppError(400, "Set your GitHub username first.");
 
-  const storedToken = settingsRepository.get(TOKEN_KEY);
+  const storedToken = await settingsRepository.get(TOKEN_KEY);
   const token = storedToken ? decrypt(storedToken) : null;
   const cacheKey = `${username.toLowerCase()}:${token ? "auth" : "anon"}`;
 

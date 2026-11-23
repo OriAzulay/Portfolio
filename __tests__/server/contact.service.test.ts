@@ -16,15 +16,15 @@ const message = (n: number) => ({
 describe("contact service", () => {
   it("stores valid messages as unread", async () => {
     await submitContactMessage(message(1), "ip-a");
-    const [stored] = listMessages();
+    const [stored] = await listMessages();
     expect(stored).toMatchObject({ name: "Dana Tester", email: "dana@example.com", isRead: false });
-    expect(countUnreadMessages()).toBe(1);
+    expect(await countUnreadMessages()).toBe(1);
   });
 
   it("silently drops honeypot submissions", async () => {
-    const before = listMessages().length;
+    const before = (await listMessages()).length;
     await submitContactMessage({ ...message(2), website: "http://spam.example" }, "ip-bot");
-    expect(listMessages()).toHaveLength(before);
+    expect(await listMessages()).toHaveLength(before);
   });
 
   it("rejects invalid input", async () => {
@@ -38,13 +38,13 @@ describe("contact service", () => {
     await expect(submitContactMessage(message(6), "ip-b")).rejects.toMatchObject({ status: 429 });
   });
 
-  it("marks messages read and deletes them", () => {
-    const [first] = listMessages();
-    updateMessage(first.id, { isRead: true });
-    expect(listMessages().find((m) => m.id === first.id)?.isRead).toBe(true);
+  it("marks messages read and deletes them", async () => {
+    const [first] = await listMessages();
+    await updateMessage(first.id, { isRead: true });
+    expect((await listMessages()).find((m) => m.id === first.id)?.isRead).toBe(true);
 
-    deleteMessage(first.id);
-    expect(listMessages().find((m) => m.id === first.id)).toBeUndefined();
-    expect(() => deleteMessage(first.id)).toThrow(/not found/i);
+    await deleteMessage(first.id);
+    expect((await listMessages()).find((m) => m.id === first.id)).toBeUndefined();
+    await expect(deleteMessage(first.id)).rejects.toThrow(/not found/i);
   });
 });

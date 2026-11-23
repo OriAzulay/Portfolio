@@ -13,7 +13,7 @@ describe("image service", () => {
     const { id, url } = await storeImageBytes(big, "gallery");
     expect(url).toBe(`/api/images/${id}`);
 
-    const stored = getImage(id);
+    const stored = await getImage(id);
     expect(stored.mimeType).toBe("image/webp");
     const { width = 0, height = 0 } = await sharp(stored.data).metadata();
     expect(Math.max(width, height)).toBeLessThanOrEqual(1920);
@@ -25,7 +25,7 @@ describe("image service", () => {
     });
   });
 
-  it("returns 404 for unknown ids", () => {
-    expect(() => getImage("00000000-0000-0000-0000-000000000000")).toThrow(/not found/i);
+  it("returns 404 for unknown ids", async () => {
+    await expect(getImage("00000000-0000-0000-0000-000000000000")).rejects.toThrow(/not found/i);
   });
 });

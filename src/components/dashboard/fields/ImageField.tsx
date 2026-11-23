@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent } from "react";
 import { api, ApiError } from "@/lib/api-client";
+import { shrinkForUpload } from "@/lib/shrink-image";
 import type { ImageKind } from "@/types/portfolio";
 import { Field } from "./Field";
 import styles from "./fields.module.css";
@@ -14,7 +15,7 @@ type ImageFieldProps = {
   onChange: (url: string) => void;
 };
 
-/** Image preview + upload button (stored in SQLite) + manual URL input. */
+/** Image preview + upload button (stored in the database) + manual URL input. */
 export function ImageField({ label, kind, value, previewSrc, onChange }: ImageFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -27,10 +28,10 @@ export function ImageField({ label, kind, value, previewSrc, onChange }: ImageFi
     setUploading(true);
     setError("");
     try {
-      const { url } = await api.uploadImage(file, kind);
+      const { url } = await api.uploadImage(await shrinkForUpload(file), kind);
       onChange(url);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Upload failed");
+      setError(err instanceof ApiError || err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
     }

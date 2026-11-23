@@ -1,5 +1,6 @@
 import "server-only";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const isProduction = process.env.NODE_ENV === "production";
 const DEV_SESSION_SECRET = "dev-only-insecure-session-secret-change-me";
@@ -9,9 +10,20 @@ let warnedAboutSecret = false;
 export const config = {
   isProduction,
 
-  /** SQLite file. On Railway point this at the mounted volume, e.g. /data/portfolio.db */
-  get databasePath(): string {
-    return process.env.DATABASE_PATH || path.join(process.cwd(), "data", "portfolio.db");
+  /**
+   * libSQL / SQLite connection URL. In production this is a Turso database
+   * (TURSO_DATABASE_URL is set automatically by the Vercel ↔ Turso integration).
+   * Without it, a local SQLite file is used: DATABASE_PATH or ./data/portfolio.db.
+   */
+  get databaseUrl(): string {
+    const remote = process.env.TURSO_DATABASE_URL || process.env.LIBSQL_URL;
+    if (remote) return remote;
+    const file = process.env.DATABASE_PATH || path.join(process.cwd(), "data", "portfolio.db");
+    return pathToFileURL(path.resolve(file)).href;
+  },
+
+  get databaseAuthToken(): string | undefined {
+    return process.env.TURSO_AUTH_TOKEN || process.env.LIBSQL_AUTH_TOKEN || undefined;
   },
 
   get adminPassword(): string {
@@ -33,6 +45,10 @@ export const config = {
     return DEV_SESSION_SECRET;
   },
 
-  /** Max upload size before compression (uploads are resized + re-encoded). */
+  /**
+   * Max upload size before compression (uploads are resized + re-encoded).
+   * Vercel rejects request bodies over ~4.5 MB, so the dashboard also shrinks
+   * very large photos in the browser before uploading.
+   */
   maxImageBytes: 15 * 1024 * 1024,
 };

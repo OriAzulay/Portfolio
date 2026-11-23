@@ -12,12 +12,19 @@ export const metadata: Metadata = { title: "Admin Dashboard", robots: { index: f
 export default async function DashboardPage() {
   if (!(await isAdmin())) redirect("/login");
 
+  const [data, messages, visitorCount, githubSettings] = await Promise.all([
+    getPortfolio(),
+    listMessages(),
+    countUniqueVisitors(),
+    getGitHubSettings(),
+  ]);
+
   return (
     <DashboardApp
-      initialData={getPortfolio()}
-      initialMessages={listMessages()}
-      visitorCount={countUniqueVisitors()}
-      githubSettings={getGitHubSettings()}
+      initialData={data}
+      initialMessages={messages}
+      visitorCount={visitorCount}
+      githubSettings={githubSettings}
     />
   );
 }
