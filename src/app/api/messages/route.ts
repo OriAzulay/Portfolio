@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     await requireAdmin();
-    return NextResponse.json({ messages: listMessages(), unread: countUnreadMessages() });
+    return NextResponse.json({ messages: await listMessages(), unread: await countUnreadMessages() });
   } catch (error) {
     return errorResponse(error);
   }

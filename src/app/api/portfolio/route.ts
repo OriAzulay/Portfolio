@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    return NextResponse.json({ data: getPortfolio() });
+    return NextResponse.json({ data: await getPortfolio() });
   } catch (error) {
     return errorResponse(error);
   }
@@ -17,7 +17,7 @@ export async function PUT(request: Request) {
   try {
     await requireAdmin();
     const body = (await readJson(request)) as { data?: unknown };
-    return NextResponse.json({ data: updatePortfolio(body?.data) });
+    return NextResponse.json({ data: await updatePortfolio(body?.data) });
   } catch (error) {
     return errorResponse(error);
   }

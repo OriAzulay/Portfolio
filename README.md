@@ -1,14 +1,14 @@
 # Portfolio
 
-A personal portfolio site with an admin dashboard, built with **Next.js 16 (App Router)**, **TypeScript** and **SQLite**.
-All content, uploaded images and contact-form messages are stored in a single SQLite file, so you don't need any external database service.
+A personal portfolio site with an admin dashboard, built with **Next.js 16 (App Router)**, **TypeScript** and **SQLite (libSQL)**.
+All content, uploaded images and contact-form messages live in one SQLite database: a local file during development, and a free [Turso](https://turso.tech) database (SQLite in the cloud) in production on Vercel.
 
 ## Features
 
 - Public portfolio: About, Resume, Projects, Contact and Gallery tabs
 - Admin dashboard at `/dashboard` to edit every section, upload images and reorder items
 - Contact form with client- and server-side validation, a honeypot field and per-IP rate limiting. Messages go to a **Messages** inbox in the dashboard.
-- Images are stored in SQLite and served from `/api/images/<id>` with long-lived cache headers
+- Images are compressed on upload and stored in the database, served from `/api/images/<id>` and cached by the CDN
 - Unique-visitor counter. Raw IPs are never stored, only keyed hashes.
 - Signed, httpOnly session cookie for the admin (no tokens in localStorage)
 
@@ -23,7 +23,7 @@ npm run dev
 - Site: http://localhost:3000
 - Admin: http://localhost:3000/login
 
-The database (`data/portfolio.db`) is created automatically on first request.
+Locally the database is the file `data/portfolio.db` (created automatically on first request, no account needed).
 
 ### Environment variables
 
@@ -31,7 +31,9 @@ The database (`data/portfolio.db`) is created automatically on first request.
 | ---------------- | --------------- | --------------------------------------------------------------------------- |
 | `ADMIN_PASSWORD` | yes             | Password for `/login`                                                       |
 | `SESSION_SECRET` | yes (prod)      | 32+ random characters; signs the session cookie and salts IP hashes         |
-| `DATABASE_PATH`  | no              | Path to the SQLite file. Defaults to `./data/portfolio.db`                  |
+| `TURSO_DATABASE_URL` | prod       | Turso database URL (set automatically by the Vercel ↔ Turso integration)  |
+| `TURSO_AUTH_TOKEN` | prod         | Turso auth token (same)                                                     |
+| `DATABASE_PATH`  | no              | Local SQLite file when no Turso URL is set. Defaults to `./data/portfolio.db` |
 | `RESEND_API_KEY` | no              | Also email new contact messages via [Resend](https://resend.com)            |
 | `CONTACT_NOTIFY_EMAIL` | no        | Where those emails go (defaults to the email on your profile)             |
 
@@ -50,8 +52,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | `npm run lint`                | ESLint                                               |
 | `npm run typecheck`           | TypeScript check                                     |
 | `npm test` / `npm run test:ci` | Vitest (watch / single run)                        |
-| `npm run db:optimize-images`  | Re-compress images already stored in SQLite          |
-| `npm run db:migrate-supabase` | One-time import from the old Supabase setup (below)  |
+| `npm run db:optimize-images`  | Re-compress images already stored in the database    |
+| `npm run db:push-remote`      | Copy all local data (`data/portfolio.db`) to Turso   |
 
 ## Tests & CI
 
@@ -70,7 +72,7 @@ src/
 │   └── api/                #   HTTP handlers -> call services, map errors
 ├── server/                 # BACKEND (server-only)
 │   ├── config.ts           #   env access
-│   ├── db/                 #   SQLite connection + versioned migrations
+│   ├── db/                 #   libSQL client (local file or Turso) + migrations
 │   ├── repositories/       #   SQL only (portfolio, images, messages, visits)
 │   ├── services/           #   business logic, validation, sanitizing
 │   ├── auth/               #   signed session cookie (jose)
@@ -91,49 +93,58 @@ src/
 
 ### Database
 
-The tables are `portfolio_sections` (one JSON row per section), `images` (BLOB + MIME type), `contact_messages` and `visits`.
-Schema changes go in `src/server/db/migrations.ts`. Append a new entry and it runs once on startup (tracked with `PRAGMA user_version`).
+The tables are `portfolio_sections` (one JSON row per section), `images` (BLOB + MIME type), `contact_messages`, `visits`, `settings` and `rate_limits`.
+The same code talks to a local SQLite file (`file:`) or to Turso over HTTP, depending on whether `TURSO_DATABASE_URL` is set.
+Schema changes go in `src/server/db/migrations.ts`. Append a new entry: it runs once, automatically, on the first request after a deploy (tracked in `schema_migrations`; statements are idempotent).
 
-**Backup:** copy `data/portfolio.db` while the app is stopped, or run `sqlite3 data/portfolio.db ".backup backup.db"`.
+**Backup:** locally, copy `data/portfolio.db` while the app is stopped. On Turso, use `turso db shell <db> .dump > backup.sql` or Turso's point-in-time restore.
 
-## Deployment (Railway, recommended)
+## Deployment (Vercel + Turso, free)
 
-SQLite needs a **persistent disk**, so deploy to a host that gives you one.
+Vercel runs the site as serverless functions, which have no permanent disk, so production uses **Turso**: a hosted SQLite database with a free plan.
 
-1. Push this repo to GitHub.
-2. On [railway.com](https://railway.com): **New Project → Deploy from GitHub repo**, and pick this repo.
-   Railway reads `railway.json`, which sets the build to `npm run build`, the start command to `npm run start` and a healthcheck on `/`. The Node version comes from `.nvmrc` (22).
-3. **Add a Volume** to the service (right-click the service → *Attach volume*) and set its mount path to `/data`.
-4. Under **Variables**, set:
-   - `DATABASE_PATH=/data/portfolio.db`
-   - `ADMIN_PASSWORD=<your password>`
-   - `SESSION_SECRET=<64 random hex chars>`
-5. Under **Settings → Networking**, click *Generate Domain* (or add your own domain).
-6. Deploy, open `/login`, and fill in your content.
+### 1. Create the database and connect it to Vercel
 
-Keep the service at **1 replica**. SQLite is a single file on a single volume.
+1. In the [Vercel dashboard](https://vercel.com/dashboard), open your project → **Storage** → **Create Database** (or **Browse Marketplace**) → choose **Turso** and follow the steps (free plan).
+2. Connect it to this project (all environments). This adds `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` to the project's environment variables automatically.
+   *Alternative:* sign up at [turso.tech](https://turso.tech), create a database, and add those two variables by hand (Project → **Settings → Environment Variables**).
 
-### Alternative: Render
+### 2. Add the other environment variables
 
-Create a **Web Service** from the repo with build command `npm install && npm run build` and start command `npm start`.
-Add a **Persistent Disk** mounted at `/data`. Persistent disks require a paid instance; the free tier wipes the filesystem on every deploy.
-Set the same variables as on Railway.
+Project → **Settings → Environment Variables**:
 
-### Why not Vercel?
+| Variable | Value |
+| --- | --- |
+| `ADMIN_PASSWORD` | a strong password for `/login` |
+| `SESSION_SECRET` | 64 random hex characters (command above) |
+| `RESEND_API_KEY` | optional - email notifications for the contact form |
 
-Vercel runs the app as serverless functions with a temporary, read-only filesystem. A SQLite file there would be lost on every deploy and cold start, and wouldn't be shared between instances. To use Vercel you'd have to switch to a hosted database (e.g. Turso, Neon) and object storage for images. That's possible, but it's exactly the external-service setup this project avoids.
+Optional for the GitHub tab: save a personal access token in the dashboard itself (it's stored encrypted with `SESSION_SECRET`, so keep that value stable).
 
-## Migrating from the old Supabase version
+### 3. Copy your local content to Turso
 
-If your content is still in Supabase, run this once with `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` still in `.env.local`:
+Create `.env.turso.local` (git-ignored) with the two Turso values from Vercel:
 
 ```bash
-npm run db:migrate-supabase
+TURSO_DATABASE_URL=libsql://<your-db>.turso.io
+TURSO_AUTH_TOKEN=<token>
 ```
 
-It copies the portfolio content and visitor rows. It also downloads every image (from Supabase Storage or `public/uploads/`) into SQLite.
-Afterwards you can remove the `SUPABASE_*` lines from `.env.local` and delete `public/uploads/`.
-Visitor hashes from Supabase used a different salt, so a returning visitor may be counted once more.
+Then run:
+
+```bash
+npm run db:push-remote
+```
+
+It creates the tables on Turso and copies all content, images, messages and settings. It is safe to run again; nothing secret is printed.
+
+### 4. Deploy
+
+Merge to `main` (or redeploy in Vercel). The tables are created automatically on first request, and the site reads from Turso.
+
+**Limits to know:**
+- **Uploads:** Vercel rejects request bodies over about 4.5 MB. The dashboard shrinks bigger photos in the browser before uploading, and the server compresses them further, to WebP under about 500 KB.
+- **Image caching:** images are served with long-lived cache headers, so repeat views are answered by Vercel's CDN without touching the database.
 
 ## Troubleshooting
 

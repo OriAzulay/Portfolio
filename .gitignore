@@ -61,3 +61,6 @@ next-env.d.ts
 
 # local Claude Code launch config
 /.claude/
+
+# Never commit account recovery codes / secrets dropped into the folder
+*recovery-codes*

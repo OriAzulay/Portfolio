@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     await requireAdmin();
-    return NextResponse.json(getGitHubSettings());
+    return NextResponse.json(await getGitHubSettings());
   } catch (error) {
     return errorResponse(error);
   }
@@ -18,7 +18,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     await requireAdmin();
-    return NextResponse.json(updateGitHubSettings(await readJson(request)));
+    return NextResponse.json(await updateGitHubSettings(await readJson(request)));
   } catch (error) {
     return errorResponse(error);
   }

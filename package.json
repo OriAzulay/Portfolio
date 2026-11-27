@@ -8,15 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "db:migrate-supabase": "tsx --conditions=react-server scripts/migrate-from-supabase.ts",
     "db:optimize-images": "tsx --conditions=react-server scripts/optimize-images.ts",
     "test": "vitest",
-    "test:ci": "vitest run"
+    "test:ci": "vitest run",
+    "db:push-remote": "tsx --conditions=react-server scripts/push-to-turso.ts"
   },
   "dependencies": {
+    "@libsql/client": "^0.18.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
-    "better-sqlite3": "^13.0.3",
     "jose": "^6.2.12",
     "next": "16.1.4",
     "react": "19.2.3",
@@ -27,7 +27,6 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

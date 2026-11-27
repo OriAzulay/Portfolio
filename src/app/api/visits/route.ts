@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    recordVisit(getClientIpHash(request));
+    await recordVisit(getClientIpHash(request));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return errorResponse(error);
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     await requireAdmin();
-    return NextResponse.json({ count: countUniqueVisitors() });
+    return NextResponse.json({ count: await countUniqueVisitors() });
   } catch (error) {
     return errorResponse(error);
   }

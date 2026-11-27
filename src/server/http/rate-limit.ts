@@ -1,32 +1,33 @@
 import "server-only";
+import { getDb } from "../db/client";
 
 /**
- * Tiny fixed-window, in-memory rate limiter. Good enough for a single
- * instance (which SQLite requires anyway).
+ * Fixed-window rate limiter stored in the database, so the limit holds across
+ * all serverless instances (in-memory counters would reset on every cold start).
  */
-export function createRateLimiter({ limit, windowMs }: { limit: number; windowMs: number }) {
-  const hits = new Map<string, { count: number; resetAt: number }>();
+export function createRateLimiter({ name, limit, windowMs }: { name: string; limit: number; windowMs: number }) {
+  const keyFor = (key: string) => `${name}:${key}`;
 
   return {
     /** Returns true if the action is allowed and counts it. */
-    consume(key: string): boolean {
+    async consume(key: string): Promise<boolean> {
+      const db = await getDb();
       const now = Date.now();
-      const entry = hits.get(key);
-
-      if (!entry || entry.resetAt <= now) {
-        hits.set(key, { count: 1, resetAt: now + windowMs });
-        if (hits.size > 10_000) {
-          for (const [k, v] of hits) if (v.resetAt <= now) hits.delete(k);
-        }
-        return true;
-      }
-      if (entry.count >= limit) return false;
-      entry.count++;
-      return true;
+      // Start a new window if the old one expired, otherwise increment - in one atomic statement.
+      const { rows } = await db.execute({
+        sql: `INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?)
+              ON CONFLICT (key) DO UPDATE SET
+                count    = CASE WHEN rate_limits.reset_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
+                reset_at = CASE WHEN rate_limits.reset_at <= ? THEN excluded.reset_at ELSE rate_limits.reset_at END
+              RETURNING count`,
+        args: [keyFor(key), now + windowMs, now, now],
+      });
+      return Number(rows[0]?.count ?? 1) <= limit;
     },
 
-    reset(key: string): void {
-      hits.delete(key);
+    async reset(key: string): Promise<void> {
+      const db = await getDb();
+      await db.execute({ sql: "DELETE FROM rate_limits WHERE key = ?", args: [keyFor(key)] });
     },
   };
 }

@@ -18,11 +18,11 @@ export async function submitContactMessage(input: unknown, ipHash: string): Prom
   const data = contactMessageSchema.parse(input);
   if (data.website) return;
 
-  if (messagesRepository.countRecentByIp(ipHash, RATE_LIMIT_WINDOW_MINUTES) >= RATE_LIMIT_MAX) {
+  if ((await messagesRepository.countRecentByIp(ipHash, RATE_LIMIT_WINDOW_MINUTES)) >= RATE_LIMIT_MAX) {
     throw new AppError(429, "You've sent several messages already. Please try again later.");
   }
 
-  messagesRepository.create({
+  await messagesRepository.create({
     name: data.name,
     email: data.email,
     message: data.message,
@@ -31,26 +31,26 @@ export async function submitContactMessage(input: unknown, ipHash: string): Prom
   await notifyNewContactMessage(data);
 }
 
-export function listMessages(): ContactMessage[] {
+export function listMessages(): Promise<ContactMessage[]> {
   return messagesRepository.list();
 }
 
-export function countUnreadMessages(): number {
+export function countUnreadMessages(): Promise<number> {
   return messagesRepository.countUnread();
 }
 
 const idSchema = z.coerce.number().int().positive();
 const updateSchema = z.object({ isRead: z.boolean() });
 
-export function updateMessage(id: unknown, input: unknown): void {
+export async function updateMessage(id: unknown, input: unknown): Promise<void> {
   const { isRead } = updateSchema.parse(input);
-  if (!messagesRepository.setRead(idSchema.parse(id), isRead)) {
+  if (!(await messagesRepository.setRead(idSchema.parse(id), isRead))) {
     throw new AppError(404, "Message not found");
   }
 }
 
-export function deleteMessage(id: unknown): void {
-  if (!messagesRepository.delete(idSchema.parse(id))) {
+export async function deleteMessage(id: unknown): Promise<void> {
+  if (!(await messagesRepository.delete(idSchema.parse(id)))) {
     throw new AppError(404, "Message not found");
   }
 }

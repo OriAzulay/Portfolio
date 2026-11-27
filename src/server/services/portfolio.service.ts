@@ -28,8 +28,8 @@ function sanitize(data: PortfolioData): PortfolioData {
  * Builds the portfolio from stored sections. Missing or invalid sections
  * fall back to the defaults, so the site always renders.
  */
-export function getPortfolio(): PortfolioData {
-  const stored = portfolioRepository.getSections();
+export async function getPortfolio(): Promise<PortfolioData> {
+  const stored = await portfolioRepository.getSections();
   const result = { ...defaultPortfolioData } as Record<PortfolioSectionKey, unknown>;
 
   for (const key of SECTION_KEYS) {
@@ -42,13 +42,13 @@ export function getPortfolio(): PortfolioData {
 }
 
 /** Validates, sanitizes and saves the whole portfolio. Throws ZodError on invalid input. */
-export function updatePortfolio(input: unknown): PortfolioData {
+export async function updatePortfolio(input: unknown): Promise<PortfolioData> {
   const data = sanitize(portfolioSchema.parse(input));
-  portfolioRepository.saveSections(data);
-  removeUnusedImages(data);
+  await portfolioRepository.saveSections(data);
+  await removeUnusedImages(data);
   return data;
 }
 
-export function hasStoredPortfolio(): boolean {
+export function hasStoredPortfolio(): Promise<boolean> {
   return portfolioRepository.hasContent();
 }
