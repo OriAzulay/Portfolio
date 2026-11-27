@@ -213,10 +213,10 @@
 .logo {
   flex-shrink: 0;
   /* Fixed height; wide wordmarks (e.g. Elbit) get more width, square logos stay square. */
-  height: 40px;
+  height: 36px;
   width: auto;
-  min-width: 40px;
-  max-width: 104px;
+  min-width: 36px;
+  max-width: 80px;
   padding: 4px 6px;
   object-fit: contain;
   border-radius: 10px;
