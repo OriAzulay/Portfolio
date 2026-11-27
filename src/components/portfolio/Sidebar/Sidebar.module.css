@@ -24,6 +24,25 @@
   flex-shrink: 0;
 }
 
+.avatarButton {
+  display: block;
+  cursor: zoom-in;
+  border-radius: inherit;
+}
+
+.avatarButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.avatarButton .avatar {
+  transition: transform var(--transition-1);
+}
+
+.avatarButton:hover .avatar {
+  transform: scale(1.04);
+}
+
 .avatar {
   background: var(--bg-gradient-onyx);
   width: 80px;
