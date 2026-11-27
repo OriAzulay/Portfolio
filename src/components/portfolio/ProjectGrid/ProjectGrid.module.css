@@ -8,7 +8,7 @@
 
 .card {
   position: relative;
-  background: var(--border-gradient-onyx);
+  background: var(--border-gradient);
   height: 100%;
   box-shadow: var(--shadow-4);
   border-radius: 12px;

@@ -6,86 +6,90 @@
   before the first paint (system preference by default, user choice persisted).
 \*-----------------------------------*/
 
-/* ---------- Dark theme (default) ---------- */
+/*
+  Palette: Blue Coal #515559 · Albescent White #F7E9DE · Spanish Pink #F0BBB4 ·
+           Terra Cotta #EA7B5E · Peach Fuzz #FFBE98
+  Text colors are checked for WCAG AA (>= 4.5:1). Raw Terra Cotta is too light
+  for text on the cream background, so it's used for decoration (gradients,
+  bars, hover) while links/accents use a deeper terra shade.
+*/
+
+/* ---------- Dark theme (default): Blue Coal surfaces, cream text, peach accents ---------- */
 :root,
 [data-theme="dark"] {
   color-scheme: dark;
 
   /* gradients */
-  --bg-gradient-onyx: linear-gradient(to bottom right, hsl(240, 1%, 25%) 3%, hsl(0, 0%, 19%) 97%);
-  --bg-gradient-jet: linear-gradient(to bottom right, hsla(240, 1%, 18%, 0.251) 0%, hsla(240, 2%, 11%, 0) 100%),
-    hsl(240, 2%, 13%);
-  --bg-gradient-blue-1: linear-gradient(to bottom right, hsl(190, 82%, 72%) 0%, hsla(36, 100%, 69%, 0) 50%);
-  --bg-gradient-blue-2: linear-gradient(135deg, hsla(190, 82%, 72%, 0.251) 0%, hsla(35, 100%, 68%, 0) 59.86%),
-    hsl(240, 2%, 13%);
-  --border-gradient-onyx: linear-gradient(to bottom right, hsl(0, 0%, 25%) 0%, hsla(0, 0%, 25%, 0) 50%);
-  --text-gradient-blue: linear-gradient(to right, hsl(190, 82%, 72%), hsl(190, 51%, 55%));
+  --bg-gradient-soft: linear-gradient(to bottom right, #4a4e53 3%, #3a3d41 97%);
+  --bg-gradient-card: linear-gradient(to bottom right, rgba(81, 85, 89, 0.35) 0%, rgba(38, 40, 43, 0) 100%), #323539;
+  --bg-gradient-accent-1: linear-gradient(to bottom right, #ea7b5e 0%, rgba(234, 123, 94, 0) 50%);
+  --bg-gradient-accent-2: linear-gradient(135deg, rgba(255, 190, 152, 0.22) 0%, rgba(255, 190, 152, 0) 60%), #323539;
+  --border-gradient: linear-gradient(to bottom right, #5c6166 0%, rgba(92, 97, 102, 0) 50%);
+  --text-gradient-accent: linear-gradient(to right, #ffbe98, #ea7b5e);
 
   /* surfaces */
-  --color-bg: hsl(0, 0%, 7%);
-  --color-surface: hsl(240, 2%, 12%);
-  --color-surface-2: hsl(240, 2%, 13%);
-  --color-chip: hsl(240, 1%, 17%);
-  --color-border: hsl(0, 0%, 22%);
-  --color-nav-bg: hsla(240, 1%, 17%, 0.8);
+  --color-bg: #26282b;
+  --color-surface: #323539;
+  --color-surface-2: #383b3f;
+  --color-chip: #44484c;
+  --color-border: #4a4e53;
+  --color-nav-bg: rgba(50, 53, 57, 0.85);
 
   /* text */
-  --color-text-strong: hsl(0, 0%, 100%);
-  --color-text: hsl(0, 0%, 98%);
-  --color-text-muted: hsl(0, 0%, 84%);
-  --color-text-subtle: hsla(0, 0%, 84%, 0.7);
+  --color-text-strong: #ffffff;
+  --color-text: #f7e9de; /* Albescent White */
+  --color-text-muted: #e0d3c9;
+  --color-text-subtle: #b9aea6;
 
   /* accents / status */
-  --color-accent: hsl(190, 82%, 72%);
-  --color-accent-2: hsl(190, 51%, 55%);
-  --color-accent-soft: hsla(190, 82%, 72%, 0.35);
-  --color-danger: hsl(0, 43%, 51%);
-  --color-success: hsl(150, 60%, 55%);
+  --color-accent: #ffbe98; /* Peach Fuzz */
+  --color-accent-2: #f0bbb4; /* Spanish Pink */
+  --color-accent-soft: rgba(255, 190, 152, 0.35);
+  --color-danger: #ff8a80;
+  --color-success: #7bd8a4;
 
   /* shadows */
-  --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.25);
-  --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.25);
-  --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.25);
-  --shadow-4: 0 25px 50px hsla(0, 0%, 0%, 0.15);
-  --shadow-5: 0 24px 80px hsla(0, 0%, 0%, 0.25);
+  --shadow-1: -4px 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-2: 0 16px 30px rgba(0, 0, 0, 0.25);
+  --shadow-3: 0 16px 40px rgba(0, 0, 0, 0.25);
+  --shadow-4: 0 25px 50px rgba(0, 0, 0, 0.15);
+  --shadow-5: 0 24px 80px rgba(0, 0, 0, 0.25);
 }
 
-/* ---------- Light theme ---------- */
+/* ---------- Light theme: Albescent White page, Blue Coal text, terra / peach accents ---------- */
 [data-theme="light"] {
   color-scheme: light;
 
-  --bg-gradient-onyx: linear-gradient(to bottom right, hsl(220, 14%, 92%) 3%, hsl(220, 14%, 85%) 97%);
-  --bg-gradient-jet: linear-gradient(to bottom right, hsla(0, 0%, 100%, 0.9) 0%, hsla(220, 20%, 97%, 0) 100%),
-    hsl(220, 20%, 98%);
-  --bg-gradient-blue-1: linear-gradient(to bottom right, hsl(192, 75%, 45%) 0%, hsla(192, 75%, 45%, 0) 50%);
-  --bg-gradient-blue-2: linear-gradient(135deg, hsla(192, 75%, 45%, 0.14) 0%, hsla(192, 75%, 45%, 0) 60%),
-    hsl(0, 0%, 100%);
-  --border-gradient-onyx: linear-gradient(to bottom right, hsl(220, 13%, 80%) 0%, hsla(220, 13%, 80%, 0) 55%);
-  --text-gradient-blue: linear-gradient(to right, hsl(192, 75%, 42%), hsl(192, 60%, 32%));
+  --bg-gradient-soft: linear-gradient(to bottom right, #ffbe98 3%, #f0bbb4 97%);
+  --bg-gradient-card: linear-gradient(to bottom right, #fffdfb 0%, rgba(252, 241, 233, 0) 100%), #fffaf6;
+  --bg-gradient-accent-1: linear-gradient(to bottom right, #ea7b5e 0%, rgba(234, 123, 94, 0) 50%);
+  --bg-gradient-accent-2: linear-gradient(135deg, rgba(255, 190, 152, 0.35) 0%, rgba(255, 190, 152, 0) 60%), #fffaf6;
+  --border-gradient: linear-gradient(to bottom right, #f0bbb4 0%, rgba(240, 187, 180, 0) 55%);
+  --text-gradient-accent: linear-gradient(to right, #ea7b5e, #ffbe98);
 
-  --color-bg: hsl(220, 20%, 95%);
-  --color-surface: hsl(0, 0%, 100%);
-  --color-surface-2: hsl(220, 25%, 98%);
-  --color-chip: hsl(220, 18%, 92%);
-  --color-border: hsl(220, 13%, 86%);
-  --color-nav-bg: hsla(0, 0%, 100%, 0.82);
+  --color-bg: #f7e9de; /* Albescent White */
+  --color-surface: #fffaf6;
+  --color-surface-2: #fcf3ec;
+  --color-chip: #f9e1dc; /* light Spanish Pink */
+  --color-border: #ebd3c6;
+  --color-nav-bg: rgba(255, 250, 246, 0.85);
 
-  --color-text-strong: hsl(222, 35%, 8%);
-  --color-text: hsl(222, 28%, 13%);
-  --color-text-muted: hsl(220, 12%, 30%);
-  --color-text-subtle: hsl(220, 9%, 42%);
+  --color-text-strong: #232528;
+  --color-text: #2e3134;
+  --color-text-muted: #515559; /* Blue Coal */
+  --color-text-subtle: #63676b;
 
-  --color-accent: hsl(192, 80%, 32%);
-  --color-accent-2: hsl(192, 65%, 30%);
-  --color-accent-soft: hsla(192, 80%, 32%, 0.3);
-  --color-danger: hsl(0, 62%, 44%);
-  --color-success: hsl(150, 60%, 30%);
+  --color-accent: #a9472f; /* deep Terra Cotta (AA on cream) */
+  --color-accent-2: #a9472f;
+  --color-accent-soft: rgba(234, 123, 94, 0.35);
+  --color-danger: #b3261e;
+  --color-success: #2e7d4f;
 
-  --shadow-1: -4px 8px 24px hsla(222, 30%, 20%, 0.08);
-  --shadow-2: 0 12px 28px hsla(222, 30%, 20%, 0.08);
-  --shadow-3: 0 12px 32px hsla(222, 30%, 20%, 0.1);
-  --shadow-4: 0 20px 40px hsla(222, 30%, 20%, 0.08);
-  --shadow-5: 0 20px 60px hsla(222, 30%, 20%, 0.1);
+  --shadow-1: -4px 8px 24px rgba(81, 85, 89, 0.1);
+  --shadow-2: 0 12px 28px rgba(81, 85, 89, 0.1);
+  --shadow-3: 0 12px 32px rgba(81, 85, 89, 0.12);
+  --shadow-4: 0 20px 40px rgba(81, 85, 89, 0.1);
+  --shadow-5: 0 20px 60px rgba(81, 85, 89, 0.12);
 }
 
 /* ---------- Theme-independent tokens ---------- */
@@ -128,8 +132,8 @@
 /* Softer shadows on large screens (dark theme; light shadows are already soft). */
 @media (min-width: 1024px) {
   :root:not([data-theme="light"]) {
-    --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.125);
-    --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.125);
-    --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.125);
+    --shadow-1: -4px 8px 24px rgba(0, 0, 0, 0.125);
+    --shadow-2: 0 16px 30px rgba(0, 0, 0, 0.125);
+    --shadow-3: 0 16px 40px rgba(0, 0, 0, 0.125);
   }
 }

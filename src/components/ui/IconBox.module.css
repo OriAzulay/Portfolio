@@ -1,6 +1,6 @@
 .iconBox {
   position: relative;
-  background: var(--border-gradient-onyx);
+  background: var(--border-gradient);
   width: 30px;
   height: 30px;
   border-radius: 8px;
