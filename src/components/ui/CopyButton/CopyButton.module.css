@@ -1,0 +1,16 @@
+.button {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-chip);
+  color: var(--color-text-muted);
+  font-size: var(--fs-8);
+  transition: border-color var(--transition-1), color var(--transition-1);
+}
+
+.button:hover,
+.button:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}

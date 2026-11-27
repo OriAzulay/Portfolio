@@ -5,8 +5,13 @@ import { GitHubIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import styles from "./ProjectGrid.module.css";
 
-function ProjectCard({ project, showTags }: { project: Project; showTags: boolean }) {
+const isGitHubUrl = (url: string) => /^https?:\/\/(www\.)?github\.com\//i.test(url);
+
+type CardProps = { project: Project; showTags: boolean; compact: boolean };
+
+function ProjectCard({ project, showTags, compact }: CardProps) {
   const hasLink = Boolean(project.link) && project.link !== "#";
+  const codeLink = hasLink && isGitHubUrl(project.link);
 
   return (
     <article className={cn(styles.card, hasLink && styles.clickable)}>
@@ -17,15 +22,6 @@ function ProjectCard({ project, showTags }: { project: Project; showTags: boolea
       <div className={styles.content}>
         <div className={styles.meta}>
           <span>{project.tags[0] || "Project"}</span>
-          {project.github && (
-            <>
-              <span className={styles.dot} />
-              <span className={styles.github}>
-                <GitHubIcon />
-                GitHub
-              </span>
-            </>
-          )}
         </div>
         <h3 className={cn(typo.h3, styles.title)}>
           {hasLink ? (
@@ -37,8 +33,8 @@ function ProjectCard({ project, showTags }: { project: Project; showTags: boolea
             project.title
           )}
         </h3>
-        <p className={styles.text}>{project.description}</p>
-        {showTags && project.tags.length > 1 && (
+        <p className={cn(styles.text, compact && styles.clamped)}>{project.description}</p>
+        {showTags && project.tags.length > 0 && (
           <ul className={styles.tags}>
             {project.tags.map((tag) => (
               <li key={tag} className={styles.tag}>
@@ -47,22 +43,45 @@ function ProjectCard({ project, showTags }: { project: Project; showTags: boolea
             ))}
           </ul>
         )}
-        {project.liveUrl && (
-          <a className={styles.liveLink} href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-            Live demo ↗
-          </a>
+        {(codeLink || project.liveUrl) && (
+          <div className={styles.actions}>
+            {codeLink && (
+              <a className={styles.action} href={project.link} target="_blank" rel="noopener noreferrer">
+                <GitHubIcon />
+                Code
+              </a>
+            )}
+            {project.liveUrl && (
+              <a
+                className={cn(styles.action, styles.actionPrimary)}
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Live demo ↗
+              </a>
+            )}
+          </div>
         )}
       </div>
     </article>
   );
 }
 
-export function ProjectGrid({ projects, showTags = false }: { projects: Project[]; showTags?: boolean }) {
+type GridProps = {
+  projects: Project[];
+  /** Show every tag under the description. */
+  showTags?: boolean;
+  /** Shorter cards (description clamped to a few lines), e.g. on the About page. */
+  compact?: boolean;
+};
+
+export function ProjectGrid({ projects, showTags = false, compact = false }: GridProps) {
   return (
     <ul className={styles.list}>
       {projects.map((project, index) => (
         <li key={`${project.title}-${index}`}>
-          <ProjectCard project={project} showTags={showTags} />
+          <ProjectCard project={project} showTags={showTags} compact={compact} />
         </li>
       ))}
     </ul>

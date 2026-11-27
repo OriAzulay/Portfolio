@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 import { MoonIcon, SunIcon } from "../icons";
 import styles from "./ThemeToggle.module.css";
@@ -15,6 +15,17 @@ const subscribe = (onChange: () => void) => {
   return () => window.removeEventListener(THEME_EVENT, onChange);
 };
 const getTheme = (): Theme => (document.documentElement.dataset.theme === "light" ? "light" : "dark");
+
+/** The saved choice, or the system preference when nothing was chosen. */
+function preferredTheme(): Theme {
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved === "light" || saved === "dark") return saved;
+  } catch {
+    // storage unavailable
+  }
+  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
 // The theme is only known in the browser (set before paint by the script in the root layout).
 const getServerTheme = (): Theme | null => null;
 
@@ -25,6 +36,17 @@ const getServerTheme = (): Theme | null => null;
 export function ThemeToggle({ className }: { className?: string }) {
   const theme = useSyncExternalStore(subscribe, getTheme, getServerTheme);
   const isDark = theme !== "light";
+
+  // React can drop attributes set on <html> by the pre-paint script while
+  // hydrating, so re-apply the preferred theme once we're interactive.
+  useEffect(() => {
+    const root = document.documentElement;
+    const preferred = preferredTheme();
+    if (root.dataset.theme !== preferred) {
+      root.dataset.theme = preferred;
+      window.dispatchEvent(new Event(THEME_EVENT));
+    }
+  }, []);
 
   const toggle = () => {
     const next: Theme = isDark ? "light" : "dark";

@@ -144,17 +144,50 @@
   height: 13px;
 }
 
-.liveLink {
-  position: relative;
-  z-index: 2; /* above the stretched card link */
-  display: inline-block;
-  margin-top: 12px;
-  color: var(--color-accent);
-  font-size: var(--fs-7);
-  font-weight: var(--fw-500);
+
+.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.liveLink:hover,
-.liveLink:focus-visible {
-  text-decoration: underline;
+/* Buttons sit above the card-wide link (z-index), so they can be clicked separately. */
+.actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-chip);
+  color: var(--color-text);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-500);
+  transition: border-color var(--transition-1), color var(--transition-1);
+}
+
+.action svg {
+  width: 14px;
+  height: 14px;
+}
+
+.action:hover,
+.action:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.actionPrimary {
+  color: var(--color-accent);
 }

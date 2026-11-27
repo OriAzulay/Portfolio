@@ -56,6 +56,7 @@ export function ProjectsEditor({ value, onChange, onSync, onOpenGitHub }: Props)
           liveUrl: "",
           imageUrl: "",
           showInKeyProjects: false,
+          featured: false,
           github: null,
         })
       }
@@ -144,6 +145,14 @@ export function ProjectsEditor({ value, onChange, onSync, onOpenGitHub }: Props)
               onChange={(e) => projects.update(index, { showInKeyProjects: e.target.checked })}
             />
             Show under &quot;Key Projects&quot; in the Resume
+          </label>
+          <label className={styles.checkbox}>
+            <input
+              type="checkbox"
+              checked={project.featured}
+              onChange={(e) => projects.update(index, { featured: e.target.checked })}
+            />
+            Feature on the About page (if none is checked, the first two are shown)
           </label>
         </ItemCard>
       ))}

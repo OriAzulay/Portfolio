@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
 import { PortfolioPage } from "@/components/portfolio/PortfolioPage";
+import { summarize } from "@/lib/site";
 import { getPortfolio } from "@/server/services/portfolio.service";
 
-// Content lives in SQLite and changes from the dashboard, so render per request.
+// Content lives in the database and changes from the dashboard, so render per request.
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { name, title, about, avatarUrl } = (await getPortfolio()).personalInfo;
-  const description = about.replace(/\s+/g, " ").trim().slice(0, 160);
+  const { name, title, headline, about } = (await getPortfolio()).personalInfo;
+  const description = summarize(headline ? `${headline}. ${about}` : about);
+  const pageTitle = title ? `${name} - ${title}` : name;
+  // The share image comes from app/opengraph-image.tsx (generated PNG).
   return {
-    title: title ? `${name} - ${title}` : name,
+    title: pageTitle,
     description,
-    openGraph: {
-      title: name,
-      description,
-      type: "profile",
-      ...(avatarUrl ? { images: [avatarUrl] } : {}),
-    },
+    alternates: { canonical: "/" },
+    openGraph: { title: pageTitle, description, type: "profile", url: "/" },
+    twitter: { card: "summary_large_image", title: pageTitle, description },
   };
 }
 

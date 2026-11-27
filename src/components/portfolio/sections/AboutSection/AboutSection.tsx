@@ -8,17 +8,17 @@ import { ProjectGrid } from "../../ProjectGrid/ProjectGrid";
 import styles from "./AboutSection.module.css";
 
 export function AboutSection({ data }: { data: PortfolioData }) {
-  const { about, stats } = data.personalInfo;
-  const highlights = [
-    { value: stats.yearsExperience, label: "Years of Experience" },
-    { value: stats.projectsCompleted, label: "Projects Completed" },
-    { value: stats.certificationsAwards, label: "Certifications & Awards" },
-  ].filter((item) => item.value);
-  const featured = data.projects.slice(0, 2);
+  const { about, headline } = data.personalInfo;
+  const highlights = data.personalInfo.highlights.filter((item) => item.value || item.label);
+  // Projects marked "featured" in the dashboard; otherwise the first two.
+  const chosen = data.projects.filter((project) => project.featured);
+  const featured = chosen.length > 0 ? chosen : data.projects.slice(0, 2);
 
   return (
     <Panel>
-      <ArticleTitle compact>Digital Identity</ArticleTitle>
+      <ArticleTitle compact className={typo.sentence}>
+        {headline || "About me"}
+      </ArticleTitle>
 
       <section className={styles.aboutText}>
         {about
@@ -33,8 +33,8 @@ export function AboutSection({ data }: { data: PortfolioData }) {
         <section className={styles.highlights}>
           <h3 className={cn(typo.h3, styles.sectionTitle)}>★ Highlights &amp; Successes</h3>
           <ul className={styles.highlightsList}>
-            {highlights.map((item) => (
-              <ContentCard as="li" key={item.label} className={styles.highlightItem}>
+            {highlights.map((item, index) => (
+              <ContentCard as="li" key={`${item.label}-${index}`} className={styles.highlightItem}>
                 <h4 className={typo.h4}>{item.value}</h4>
                 <p className={styles.highlightLabel}>{item.label}</p>
               </ContentCard>
@@ -48,7 +48,7 @@ export function AboutSection({ data }: { data: PortfolioData }) {
           <div className={styles.featuredHeader}>
             <h3 className={cn(typo.h3, styles.sectionTitle)}>Featured Projects</h3>
           </div>
-          <ProjectGrid projects={featured} />
+          <ProjectGrid projects={featured} compact />
         </section>
       )}
     </Panel>

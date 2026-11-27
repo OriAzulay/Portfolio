@@ -6,7 +6,7 @@ import { imagesRepository, type StoredImage } from "../repositories/images.repos
 import { optimizeImage } from "./image-processing";
 import type { ImageKind, PortfolioData } from "@/types/portfolio";
 
-const IMAGE_KINDS: readonly ImageKind[] = ["avatar", "project", "gallery"];
+const IMAGE_KINDS: readonly ImageKind[] = ["avatar", "project", "gallery", "logo"];
 const IMAGE_URL_PATTERN = /\/api\/images\/([0-9a-f-]{36})/g;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
@@ -53,6 +53,31 @@ export async function storeUploadedImage(file: unknown, kind: unknown) {
     throw new AppError(413, `Image is too large (max ${config.maxImageBytes / 1024 / 1024} MB)`);
   }
   return storeImageBytes(Buffer.from(await file.arrayBuffer()), parseImageKind(kind));
+}
+
+const MAX_DOCUMENT_BYTES = 4 * 1024 * 1024; // under Vercel's request body limit
+
+/** Stores a PDF (e.g. the CV) in the same table as images. */
+export async function storeDocumentBytes(bytes: Buffer): Promise<{ id: string; url: string; size: number }> {
+  if (bytes.length === 0) throw new AppError(400, "Empty file");
+  if (bytes.length > MAX_DOCUMENT_BYTES) throw new AppError(413, "PDF is too large (max 4 MB)");
+  if (bytes.subarray(0, 5).toString("ascii") !== "%PDF-") throw new AppError(415, "Only PDF files are supported");
+
+  const id = crypto.randomUUID();
+  await imagesRepository.insert({ id, kind: "document", mimeType: "application/pdf", data: bytes });
+  return { id, url: imageUrl(id), size: bytes.length };
+}
+
+export async function storeUploadedDocument(file: unknown) {
+  if (!(file instanceof File)) throw new AppError(400, "Missing file");
+  return storeDocumentBytes(Buffer.from(await file.arrayBuffer()));
+}
+
+/** Returns the stored file behind an /api/images/<id> URL, or null for other URLs. */
+export async function getStoredFileByUrl(url: string): Promise<StoredImage | null> {
+  const id = /^\/api\/images\/([0-9a-f-]{36})$/.exec(url)?.[1];
+  if (!id) return null;
+  return getImage(id).catch(() => null);
 }
 
 export async function getImage(id: string): Promise<StoredImage> {

@@ -1,11 +1,17 @@
 import { cn } from "@/lib/utils";
 import typo from "./Typography.module.css";
 
+type ArticleTitleProps = {
+  children: string;
+  compact?: boolean;
+  className?: string;
+};
+
 /** Section heading with the gradient underline. */
-export function ArticleTitle({ children, compact }: { children: string; compact?: boolean }) {
+export function ArticleTitle({ children, compact, className }: ArticleTitleProps) {
   return (
     <header>
-      <h2 className={cn(typo.h2, typo.articleTitle, compact && typo.compact)}>{children}</h2>
+      <h2 className={cn(typo.h2, typo.articleTitle, compact && typo.compact, className)}>{children}</h2>
     </header>
   );
 }

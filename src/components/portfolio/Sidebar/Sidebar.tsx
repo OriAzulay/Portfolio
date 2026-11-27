@@ -56,6 +56,14 @@ export function Sidebar({ info }: { info: PersonalInfo }) {
         <div>
           <h1 className={styles.name}>{info.name}</h1>
           <p className={styles.title}>{info.title}</p>
+          {info.cvUrl && (
+            <a className={styles.cvButton} href="/cv" target="_blank" rel="noopener noreferrer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Download CV
+            </a>
+          )}
         </div>
 
         <button

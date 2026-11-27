@@ -127,3 +127,11 @@
 .surface li {
   list-style: disc;
 }
+
+.spacerSmall {
+  height: 20px;
+}
+
+.imageControls + .imageControls {
+  margin-top: 10px;
+}

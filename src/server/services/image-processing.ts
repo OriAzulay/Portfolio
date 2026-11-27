@@ -24,6 +24,7 @@ const MAX_DIMENSION: Record<ImageKind, number> = {
   avatar: 800,
   project: 1600,
   gallery: 1920,
+  logo: 256,
 };
 
 /** Images at or below this size are stored as-is. */

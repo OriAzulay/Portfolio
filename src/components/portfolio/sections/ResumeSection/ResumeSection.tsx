@@ -21,11 +21,28 @@ function Timeline({ title, icon, children }: { title: string; icon: ReactNode; c
   );
 }
 
+/** Title + organization, with the organization's logo on the left when one is set. */
+function EntryHeader({ title, organization, logoUrl }: { title: string; organization: string; logoUrl: string }) {
+  const text = (
+    <div>
+      <h4 className={cn(typo.h4, styles.itemTitle)}>{title}</h4>
+      {organization && <p className={styles.company}>{organization}</p>}
+    </div>
+  );
+  if (!logoUrl) return text;
+  return (
+    <div className={styles.entryHeader}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- small logo from the DB */}
+      <img className={styles.logo} src={logoUrl} alt={organization ? `${organization} logo` : ""} loading="lazy" />
+      {text}
+    </div>
+  );
+}
+
 function TimelineEntries({ items }: { items: TimelineEntry[] }) {
   return items.map((item, index) => (
     <li className={styles.timelineItem} key={index}>
-      <h4 className={cn(typo.h4, styles.itemTitle)}>{item.title}</h4>
-      {item.company && <p className={styles.company}>{item.company}</p>}
+      <EntryHeader title={item.title} organization={item.company} logoUrl={item.logoUrl} />
       <span className={styles.period}>{item.period}</span>
       {/* Sanitized on the server (see server/services/sanitize.ts) */}
       <div className={styles.text} dangerouslySetInnerHTML={{ __html: item.description }} />
@@ -94,9 +111,8 @@ export function ResumeSection({ data }: { data: PortfolioData }) {
         <Timeline title="Education" icon={<BookIcon />}>
           {data.education.map((item, index) => (
             <li className={styles.timelineItem} key={index}>
-              <h4 className={cn(typo.h4, styles.itemTitle)}>{item.degree}</h4>
+              <EntryHeader title={item.degree} organization={item.school} logoUrl={item.logoUrl} />
               <span className={styles.period}>{item.period}</span>
-              <p className={styles.text}>{item.school}</p>
             </li>
           ))}
         </Timeline>
