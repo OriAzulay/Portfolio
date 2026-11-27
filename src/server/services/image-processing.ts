@@ -1,6 +1,23 @@
 import "server-only";
-import sharp from "sharp";
 import type { ImageKind } from "@/types/portfolio";
+
+type Sharp = typeof import("sharp").default;
+let sharpModule: Promise<Sharp | null> | null = null;
+
+/**
+ * Loads sharp lazily, only when an image is actually processed, so pages that
+ * never touch images don't depend on its native binary. If it can't load on
+ * the current platform, uploads still work - they're just stored uncompressed.
+ */
+function loadSharp(): Promise<Sharp | null> {
+  sharpModule ??= import("sharp")
+    .then((mod) => mod.default)
+    .catch((error) => {
+      console.error("[images] sharp is unavailable - storing images without compression:", error);
+      return null;
+    });
+  return sharpModule;
+}
 
 /** Longest edge allowed per image kind. */
 const MAX_DIMENSION: Record<ImageKind, number> = {
@@ -34,6 +51,9 @@ export async function optimizeImage(
   kind: ImageKind
 ): Promise<ProcessedImage> {
   if (mimeType === "image/gif") return { data: bytes, mimeType };
+
+  const sharp = await loadSharp();
+  if (!sharp) return { data: bytes, mimeType };
 
   const max = MAX_DIMENSION[kind];
   const metadata = await sharp(bytes).metadata();
