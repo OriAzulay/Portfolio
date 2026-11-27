@@ -44,10 +44,16 @@
   box-shadow: 0 0 0 4px var(--color-border);
 }
 
-.itemTitle {
+/* Doubled class: must beat the shared .h4 size regardless of CSS chunk order. */
+.itemTitle.itemTitle {
   font-size: var(--fs-5);
   line-height: 1.3;
   margin-bottom: 7px;
+}
+
+/* Hide empty bullets left behind by the rich-text editor */
+.text li:empty {
+  display: none;
 }
 
 .period {
@@ -174,7 +180,7 @@
   margin-bottom: 20px;
 }
 
-.groupTitle {
+.groupTitle.groupTitle {
   margin-bottom: 8px;
   color: var(--color-accent);
 }
