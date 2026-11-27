@@ -7,7 +7,15 @@ import { AppError } from "../http/errors";
 const COOKIE_NAME = "portfolio_session";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
-const secretKey = () => new TextEncoder().encode(config.sessionSecret);
+const secretKey = () => {
+  try {
+    return new TextEncoder().encode(config.sessionSecret);
+  } catch (error) {
+    // Surface a clear, safe message instead of a generic "Internal server error".
+    console.error("[auth]", error);
+    throw new AppError(500, "Login is not configured on the server: SESSION_SECRET must be at least 32 characters.");
+  }
+};
 
 /** Issues a signed, httpOnly admin session cookie. */
 export async function createSession(): Promise<void> {
