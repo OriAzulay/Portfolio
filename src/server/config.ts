@@ -32,11 +32,14 @@ export const config = {
 
   /** Signs session cookies and salts IP hashes. Required in production. */
   get sessionSecret(): string {
-    const secret = process.env.SESSION_SECRET;
+    // Tolerate stray whitespace/quotes from copy-pasting into a dashboard.
+    const secret = process.env.SESSION_SECRET?.trim().replace(/^["']|["']$/g, "");
     if (secret && secret.length >= 32) return secret;
 
     if (isProduction) {
-      throw new Error("SESSION_SECRET must be set (at least 32 characters) in production");
+      throw new Error(
+        `SESSION_SECRET must be set (at least 32 characters) in production - currently ${secret ? `${secret.length} characters` : "missing"}`
+      );
     }
     if (!warnedAboutSecret) {
       warnedAboutSecret = true;

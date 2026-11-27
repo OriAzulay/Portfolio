@@ -5,6 +5,7 @@ import type { PersonalInfo } from "@/types/portfolio";
 import { avatarSrc } from "@/lib/placeholders";
 import { cn } from "@/lib/utils";
 import { IconBox } from "@/components/ui/IconBox";
+import { Lightbox } from "@/components/ui/Lightbox/Lightbox";
 import { Panel } from "@/components/ui/Panel";
 import {
   GitHubIcon,
@@ -26,14 +27,31 @@ const SOCIAL_LINKS = [
 
 export function Sidebar({ info }: { info: PersonalInfo }) {
   const [open, setOpen] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
+  const avatar = avatarSrc(info.avatarUrl, info.name);
 
   return (
     <Panel as="aside" className={cn(styles.sidebar, open && styles.open)}>
       <div className={styles.info}>
         <figure className={styles.avatarBox}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- user-provided URL or DB image */}
-          <img className={styles.avatar} src={avatarSrc(info.avatarUrl, info.name)} alt={info.name} />
+          {info.avatarUrl ? (
+            <button
+              type="button"
+              className={styles.avatarButton}
+              onClick={() => setZoomed(true)}
+              aria-label={`Enlarge photo of ${info.name}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- user-provided URL or DB image */}
+              <img className={styles.avatar} src={avatar} alt={info.name} />
+            </button>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- generated placeholder
+            <img className={styles.avatar} src={avatar} alt={info.name} />
+          )}
         </figure>
+        {info.avatarUrl && (
+          <Lightbox src={avatar} alt={info.name} open={zoomed} onClose={() => setZoomed(false)} />
+        )}
 
         <div>
           <h1 className={styles.name}>{info.name}</h1>
