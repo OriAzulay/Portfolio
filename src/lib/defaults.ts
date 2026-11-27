@@ -5,6 +5,8 @@ export const defaultPortfolioData: PortfolioData = {
   personalInfo: {
     name: "Your Name",
     title: "Software Developer",
+    headline: "Software developer building reliable, well-crafted software",
+    cvUrl: "",
     avatarUrl: "",
     email: "your.email@example.com",
     phone: "+1 234 567 8900",
@@ -23,6 +25,11 @@ With a strong foundation in both frontend and backend development, I strive to d
       projectsCompleted: "15+",
       certificationsAwards: "5+",
     },
+    highlights: [
+      { value: "3+", label: "Years of Experience" },
+      { value: "15+", label: "Projects Completed" },
+      { value: "5+", label: "Certifications & Awards" },
+    ],
   },
   skills: [
     { name: "JavaScript", level: 90 },
@@ -44,12 +51,14 @@ With a strong foundation in both frontend and backend development, I strive to d
       company: "Company Name",
       period: "2023 - Present",
       description: "Developing and maintaining web applications using React and Node.js.",
+      logoUrl: "",
     },
     {
       title: "Junior Developer",
       company: "Previous Company",
       period: "2021 - 2023",
       description: "Built responsive web interfaces and collaborated with cross-functional teams.",
+      logoUrl: "",
     },
   ],
   education: [
@@ -57,6 +66,7 @@ With a strong foundation in both frontend and backend development, I strive to d
       degree: "Bachelor's in Computer Science",
       school: "University Name",
       period: "2017 - 2021",
+      logoUrl: "",
     },
   ],
   projects: [
@@ -68,6 +78,7 @@ With a strong foundation in both frontend and backend development, I strive to d
       liveUrl: "",
       imageUrl: "",
       showInKeyProjects: false,
+      featured: false,
       github: null,
     },
     {
@@ -78,6 +89,7 @@ With a strong foundation in both frontend and backend development, I strive to d
       liveUrl: "",
       imageUrl: "",
       showInKeyProjects: false,
+      featured: false,
       github: null,
     },
     {
@@ -88,6 +100,7 @@ With a strong foundation in both frontend and backend development, I strive to d
       liveUrl: "",
       imageUrl: "",
       showInKeyProjects: false,
+      featured: false,
       github: null,
     },
   ],

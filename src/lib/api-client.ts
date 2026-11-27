@@ -59,6 +59,12 @@ export const api = {
   deleteMessage: (id: number) =>
     request<{ success: true }>(`/api/messages/${id}`, { method: "DELETE" }),
 
+  uploadDocument: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return request<{ id: string; url: string }>("/api/documents", { method: "POST", body: form });
+  },
+
   getGitHubSettings: () => request<GitHubSettings>("/api/github/settings", { cache: "no-store" }),
 
   /** token: undefined keeps the saved token, "" removes it. */

@@ -3,6 +3,7 @@
 import type { PortfolioData, TimelineEntry } from "@/types/portfolio";
 import form from "@/components/ui/Form.module.css";
 import { Field } from "../fields/Field";
+import { ImageField } from "../fields/ImageField";
 import { RichTextEditor } from "../fields/RichTextEditor";
 import { EditorSection, EmptyHint, ItemCard } from "./EditorSection";
 import { listActions } from "./listActions";
@@ -24,6 +25,11 @@ type Props = {
   /** Number of GitHub/portfolio projects also shown under Key Projects. */
   linkedKeyProjects: number;
 };
+
+/** Neutral square shown until a logo is uploaded. */
+const LOGO_PLACEHOLDER =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='100%' height='100%' fill='#e9e4df'/></svg>");
 
 const clampLevel = (value: string) => Math.min(100, Math.max(0, Math.round(Number(value) || 0)));
 
@@ -48,7 +54,9 @@ function TimelineEditor({
     <EditorSection
       title={title}
       addLabel={addLabel}
-      onAdd={() => list.add({ title: `New ${roleLabel.toLowerCase()}`, company: "", period: "", description: "" })}
+      onAdd={() =>
+        list.add({ title: `New ${roleLabel.toLowerCase()}`, company: "", period: "", description: "", logoUrl: "" })
+      }
     >
       {items.length === 0 && <EmptyHint>Nothing here yet - this section is hidden on the site while empty.</EmptyHint>}
       {items.map((item, index) => (
@@ -69,6 +77,13 @@ function TimelineEditor({
               onChange={(v) => list.update(index, { period: v })}
             />
           </div>
+          <ImageField
+            label="Logo"
+            kind="logo"
+            value={item.logoUrl}
+            previewSrc={item.logoUrl || LOGO_PLACEHOLDER}
+            onChange={(url) => list.update(index, { logoUrl: url })}
+          />
           <RichTextEditor
             label="Description"
             value={item.description}
@@ -143,7 +158,7 @@ export function ResumeEditor({ data, onChange, linkedKeyProjects }: Props) {
       <EditorSection
         title="Education"
         addLabel="Add education"
-        onAdd={() => education.add({ degree: "New degree", school: "", period: "" })}
+        onAdd={() => education.add({ degree: "New degree", school: "", period: "", logoUrl: "" })}
       >
         {data.education.length === 0 && <EmptyHint>No education entries yet.</EmptyHint>}
         {data.education.map((item, index) => (
@@ -159,6 +174,13 @@ export function ResumeEditor({ data, onChange, linkedKeyProjects }: Props) {
               <Field label="School" value={item.school} onChange={(v) => education.update(index, { school: v })} />
               <Field label="Period" value={item.period} onChange={(v) => education.update(index, { period: v })} />
             </div>
+            <ImageField
+              label="Logo"
+              kind="logo"
+              value={item.logoUrl}
+              previewSrc={item.logoUrl || LOGO_PLACEHOLDER}
+              onChange={(url) => education.update(index, { logoUrl: url })}
+            />
           </ItemCard>
         ))}
       </EditorSection>

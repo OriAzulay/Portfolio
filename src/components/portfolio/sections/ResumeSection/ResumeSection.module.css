@@ -191,3 +191,30 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Entry with an organization logo on the left */
+.entryHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.entryHeader .itemTitle {
+  margin-bottom: 2px;
+}
+
+.logo {
+  flex-shrink: 0;
+  /* Fixed height; wide wordmarks (e.g. Elbit) get more width, square logos stay square. */
+  height: 40px;
+  width: auto;
+  min-width: 40px;
+  max-width: 104px;
+  padding: 4px 6px;
+  object-fit: contain;
+  border-radius: 10px;
+  /* Light pad so colored logos stay readable in dark mode too */
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+}

@@ -156,3 +156,7 @@
 .spacer {
   height: 20px;
 }
+
+.checkbox + .checkbox {
+  margin-top: 10px;
+}

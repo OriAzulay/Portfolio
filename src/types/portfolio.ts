@@ -4,6 +4,7 @@ import type {
   experienceSchema,
   galleryItemSchema,
   githubLinkSchema,
+  highlightSchema,
   keyProjectSchema,
   skillGroupSchema,
   personalInfoSchema,
@@ -20,8 +21,9 @@ export type TimelineEntry = Experience;
 export type SkillGroup = z.output<typeof skillGroupSchema>;
 export type KeyProject = z.output<typeof keyProjectSchema>;
 export type GitHubLink = z.output<typeof githubLinkSchema>;
+export type Highlight = z.output<typeof highlightSchema>;
 export type Project = z.output<typeof projectSchema>;
 export type GalleryItem = z.output<typeof galleryItemSchema>;
 export type PortfolioData = z.output<typeof portfolioSchema>;
 
-export type ImageKind = "avatar" | "project" | "gallery";
+export type ImageKind = "avatar" | "project" | "gallery" | "logo";

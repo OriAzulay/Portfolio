@@ -1,6 +1,6 @@
 .sidebar {
   margin-bottom: 15px;
-  max-height: 112px;
+  max-height: 150px; /* room for the Download CV button */
   overflow: hidden;
   transition: var(--transition-2);
 }
@@ -66,6 +66,28 @@
   width: max-content;
   padding: 3px 12px;
   border-radius: 8px;
+}
+
+.cvButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: var(--fs-8);
+  font-weight: var(--fw-500);
+  color: var(--color-accent);
+  background: var(--color-chip);
+  border: 1px solid var(--color-accent-soft);
+  transition: border-color var(--transition-1), transform var(--transition-1);
+}
+
+.cvButton:hover,
+.cvButton:focus-visible {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
 }
 
 .moreBtn {
@@ -278,6 +300,10 @@
 
   .title {
     margin: auto;
+  }
+
+  .cvButton {
+    margin: 12px auto 0;
   }
 
   .moreBtn {

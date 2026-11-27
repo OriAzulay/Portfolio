@@ -10,6 +10,21 @@
   perspective: 1000px;
 }
 
+.cardButton {
+  display: block;
+  border-radius: 10px;
+  cursor: zoom-in;
+}
+
+.cardButton:disabled {
+  cursor: default;
+}
+
+.cardButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
 .card {
   position: relative;
   width: 160px;
@@ -28,7 +43,7 @@
 .cardBg {
   position: absolute;
   inset: 0;
-  opacity: 0.5;
+  opacity: 1;
   pointer-events: none;
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
@@ -44,7 +59,9 @@
   bottom: 0;
   padding: 15px;
   color: #fff;
-  transform: translateY(40%);
+  width: 100%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.55) 100%);
+  transform: translateY(30%);
   transition: transform 0.6s ease-in-out;
   pointer-events: none;
   user-select: none;
@@ -71,11 +88,13 @@
   font-family: var(--ff-courgette);
   font-size: 15px;
   font-weight: 300;
-  opacity: 0.7;
+  display: block;
+  opacity: 1;
   text-shadow: rgba(0, 0, 0, 0.5) 0 10px 10px;
 }
 
 .cardText {
+  display: block;
   font-size: 9px;
   padding: 2px;
   opacity: 0;
@@ -83,7 +102,7 @@
   transition: opacity 0.3s ease-in-out;
 }
 
-.cardWrap:hover .card,
+.cardWrap:is(:hover, :focus-within) .card,
 .cardWrap:focus-within .card {
   transform: rotateX(8deg) rotateY(8deg);
   box-shadow:
@@ -94,20 +113,19 @@
     inset white 0 0 0 6px;
 }
 
-.cardWrap:hover .cardBg {
+.cardWrap:is(:hover, :focus-within) .cardBg {
   transform: scale(1.05) translateY(-10px);
-  opacity: 0.8;
 }
 
-.cardWrap:hover .cardInfo {
+.cardWrap:is(:hover, :focus-within) .cardInfo {
   transform: translateY(0);
 }
 
-.cardWrap:hover .cardText {
+.cardWrap:is(:hover, :focus-within) .cardText {
   opacity: 0.7;
 }
 
-.cardWrap:hover .cardInfo::after {
+.cardWrap:is(:hover, :focus-within) .cardInfo::after {
   opacity: 1;
   transform: translateY(0);
 }

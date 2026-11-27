@@ -15,9 +15,36 @@ const safeUrl = z
   .refine(isSafeUrl, "Must be an http(s) URL or a site path")
   .default("");
 
-export const personalInfoSchema = z.object({
+export const highlightSchema = z.object({
+  value: text(20),
+  label: text(60),
+});
+
+const LEGACY_STAT_LABELS = {
+  yearsExperience: "Years of Experience",
+  projectsCompleted: "Projects Completed",
+  certificationsAwards: "Certifications & Awards",
+} as const;
+
+/** Older saved data had three fixed "stats"; turn them into editable highlights. */
+function withHighlights(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object" || "highlights" in raw) return raw;
+  const stats = (raw as { stats?: Record<string, unknown> }).stats ?? {};
+  const highlights = Object.entries(LEGACY_STAT_LABELS)
+    .map(([key, label]) => ({ value: String(stats[key] ?? ""), label }))
+    .filter((item) => item.value);
+  return { ...raw, highlights };
+}
+
+export const personalInfoSchema = z.preprocess(
+  withHighlights,
+  z.object({
   name: text(100),
   title: text(100),
+  /** Short line shown as the About heading, e.g. "C++ backend developer building …". */
+  headline: text(150),
+  /** Link to the CV PDF (uploaded in the dashboard). */
+  cvUrl: safeUrl,
   avatarUrl: safeUrl,
   email: text(200),
   phone: text(50),
@@ -31,6 +58,7 @@ export const personalInfoSchema = z.object({
       instagram: safeUrl,
     })
     .prefault({}),
+  /** @deprecated kept so old data still validates; use highlights. */
   stats: z
     .object({
       yearsExperience: text(20),
@@ -38,7 +66,9 @@ export const personalInfoSchema = z.object({
       certificationsAwards: text(20),
     })
     .prefault({}),
-});
+  highlights: z.array(highlightSchema).max(6).default([]),
+  })
+);
 
 export const skillSchema = z.object({
   name: text(60),
@@ -51,6 +81,8 @@ export const experienceSchema = z.object({
   period: text(60),
   /** Limited rich text (sanitized on the server). */
   description: z.string().max(10_000).default(""),
+  /** Small organization logo shown next to the entry. */
+  logoUrl: safeUrl,
 });
 
 /** Military service / volunteering use the same shape as experience. */
@@ -75,6 +107,7 @@ export const educationSchema = z.object({
   degree: text(150),
   school: text(150),
   period: text(60),
+  logoUrl: safeUrl,
 });
 
 export const githubLinkSchema = z.object({
@@ -94,6 +127,8 @@ export const projectSchema = z.object({
   imageUrl: safeUrl,
   /** Also list this project under "Key Projects" in the Resume. */
   showInKeyProjects: z.boolean().default(false),
+  /** Show on the About page under "Featured Projects". */
+  featured: z.boolean().default(false),
   /** Set when the project was imported from (and can sync with) GitHub. */
   github: githubLinkSchema.nullable().default(null),
 });

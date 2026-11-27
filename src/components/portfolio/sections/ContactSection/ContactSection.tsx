@@ -1,5 +1,6 @@
 import type { PersonalInfo } from "@/types/portfolio";
 import { ArticleTitle } from "@/components/ui/ArticleTitle";
+import { CopyButton } from "@/components/ui/CopyButton/CopyButton";
 import { IconBox } from "@/components/ui/IconBox";
 import { Panel } from "@/components/ui/Panel";
 import { MailIcon, PhoneIcon, PinIcon } from "@/components/ui/icons";
@@ -26,6 +27,7 @@ export function ContactSection({ info }: { info: PersonalInfo }) {
                 <a className={styles.detailsText} href={`mailto:${info.email}`}>
                   {info.email}
                 </a>
+                <CopyButton text={info.email} label="Copy" />
               </li>
             )}
             {info.phone && (

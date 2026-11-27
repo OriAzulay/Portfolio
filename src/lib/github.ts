@@ -43,6 +43,7 @@ export function projectFromRepo(repo: GitHubRepo): Project {
     liveUrl: repo.homepage,
     imageUrl: "",
     showInKeyProjects: false,
+    featured: false,
     github: { repoId: repo.id, fullName: repo.fullName, syncedAt: new Date().toISOString() },
   };
 }

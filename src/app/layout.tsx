@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Courgette, Poppins } from "next/font/google";
 import { themeInitScript } from "@/components/ui/ThemeToggle/ThemeToggle";
+import { siteUrl } from "@/lib/site";
 import "@/styles/globals.css";
 
 const poppins = Poppins({
@@ -18,6 +19,7 @@ const courgette = Courgette({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: { default: "Portfolio", template: "%s" },
   description: "Personal portfolio",
 };

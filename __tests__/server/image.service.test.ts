@@ -29,3 +29,18 @@ describe("image service", () => {
     await expect(getImage("00000000-0000-0000-0000-000000000000")).rejects.toThrow(/not found/i);
   });
 });
+
+describe("document (CV) storage", () => {
+  it("stores a PDF and returns its URL", async () => {
+    const { storeDocumentBytes } = await import("@/server/services/image.service");
+    const pdf = Buffer.from("%PDF-1.4\n% test\n");
+    const { id, url } = await storeDocumentBytes(pdf);
+    expect(url).toBe(`/api/images/${id}`);
+    expect((await getImage(id)).mimeType).toBe("application/pdf");
+  });
+
+  it("rejects files that aren't PDFs", async () => {
+    const { storeDocumentBytes } = await import("@/server/services/image.service");
+    await expect(storeDocumentBytes(Buffer.from("<html>not a pdf</html>"))).rejects.toMatchObject({ status: 415 });
+  });
+});
