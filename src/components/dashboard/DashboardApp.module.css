@@ -46,7 +46,7 @@
   position: relative;
   padding: 10px 16px;
   border-radius: 12px;
-  background: var(--border-gradient-onyx);
+  background: var(--border-gradient);
   color: var(--color-text);
   font-size: var(--fs-7);
   box-shadow: var(--shadow-2);
@@ -59,12 +59,12 @@
   position: absolute;
   inset: 1px;
   border-radius: inherit;
-  background: var(--bg-gradient-jet);
+  background: var(--bg-gradient-card);
   z-index: -1;
 }
 
 .btn:hover:not(:disabled) {
-  background: var(--bg-gradient-blue-1);
+  background: var(--bg-gradient-accent-1);
   color: var(--color-text-strong);
 }
 

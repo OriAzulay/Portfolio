@@ -44,7 +44,7 @@
 }
 
 .avatar {
-  background: var(--bg-gradient-onyx);
+  background: var(--bg-gradient-soft);
   width: 80px;
   height: 80px;
   object-fit: cover;
@@ -75,7 +75,7 @@
   border-radius: 0 15px;
   font-size: 13px;
   color: var(--color-accent);
-  background: var(--border-gradient-onyx);
+  background: var(--border-gradient);
   padding: 10px;
   box-shadow: var(--shadow-2);
   transition: var(--transition-1);
@@ -87,19 +87,19 @@
   position: absolute;
   inset: 1px;
   border-radius: inherit;
-  background: var(--bg-gradient-jet);
+  background: var(--bg-gradient-card);
   transition: var(--transition-1);
   z-index: -1;
 }
 
 .moreBtn:hover,
 .moreBtn:focus-visible {
-  background: var(--bg-gradient-blue-1);
+  background: var(--bg-gradient-accent-1);
 }
 
 .moreBtn:hover::before,
 .moreBtn:focus-visible::before {
-  background: var(--bg-gradient-blue-2);
+  background: var(--bg-gradient-accent-2);
 }
 
 .moreLabel {

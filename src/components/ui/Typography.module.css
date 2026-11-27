@@ -36,7 +36,7 @@
   left: 0;
   width: 50px;
   height: 3px;
-  background: var(--text-gradient-blue);
+  background: var(--text-gradient-accent);
   border-radius: 3px;
 }
 

@@ -85,7 +85,7 @@
 .button {
   position: relative;
   width: 100%;
-  background: var(--border-gradient-onyx);
+  background: var(--border-gradient);
   color: var(--color-accent);
   display: flex;
   justify-content: center;
@@ -104,18 +104,18 @@
   content: "";
   position: absolute;
   inset: 1px;
-  background: var(--bg-gradient-jet);
+  background: var(--bg-gradient-card);
   border-radius: inherit;
   z-index: -1;
   transition: var(--transition-1);
 }
 
 .button:hover:not(:disabled) {
-  background: var(--bg-gradient-blue-1);
+  background: var(--bg-gradient-accent-1);
 }
 
 .button:hover:not(:disabled)::before {
-  background: var(--bg-gradient-blue-2);
+  background: var(--bg-gradient-accent-2);
 }
 
 .button:disabled {
